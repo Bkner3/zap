@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <title>Zap PM </title>
+</head>
+<body>
+  <div class="scanline"></div>
+  <div class="corner-tag">v0.1.0</div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <span class="badge">zippy asset packager</span>
+
+      <pre class="ascii-logo">███████╗ █████╗ ██████╗
+╚══███╔╝██╔══██╗██╔══██╗
+  ███╔╝ ███████║██████╔╝
+ ███╔╝  ██╔══██║██╔═══╝
+███████╗██║  ██║██║
+╚══════╝╚═╝  ╚═╝╚═╝<span class="cursor"></span></pre>
+
+      <p class="description">
+        A <strong>lightweight</strong> command-line package manager written in Python.
+        Fast installs, zero bloat.
+      </p>
+
+      <div class="actions">
+        <a class="btn-primary" href="https://github.com/Bkner3/zap" target="_blank">
+          <svg viewBox="0 0 16 16" fill="currentColor" width="15" height="15">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          view on github
+        </a>
+        <a class="btn-ghost" href="https://github.com/Bkner3/zap" target="_blank">star the repo ↗</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+          <span class="terminal-title">zsh</span>
+        </div>
+        <div class="terminal-body">
+          <p><span class="prompt">$</span> zap install cowsay</p>
+          <p class="out">searching index...</p>
+          <p class="out">downloading <span class="hl">cowsay.zip</span> ━━━━━━━━━━ 100%</p>
+          <p class="out">installing...</p>
+          <p class="out success">✔ cowsay installed successfully</p>
+          <p style="margin-top:10px"><span class="prompt">$</span> zap list</p>
+          <p class="out hl">cowsay</p>
+          <p style="margin-top:10px"><span class="prompt">$</span><span class="blink-cursor"> </span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- COMMANDS -->
+  <section class="section">
+    <h2 class="section-title"><span class="title-accent">01</span> commands</h2>
+    <div class="commands-grid">
+      <div class="cmd-row"><code>zap install &lt;pkg&gt;</code><span>install a package</span></div>
+      <div class="cmd-row"><code>zap remove &lt;pkg&gt;</code><span>remove a package</span></div>
+      <div class="cmd-row"><code>zap download &lt;pkg&gt;</code><span>download without installing</span></div>
+      <div class="cmd-row"><code>zap update &lt;pkg&gt;</code><span>update a specific package</span></div>
+      <div class="cmd-row"><code>zap update-all</code><span>update all installed packages</span></div>
+      <div class="cmd-row"><code>zap search &lt;pkg&gt;</code><span>search the repository</span></div>
+      <div class="cmd-row"><code>zap add &lt;repo&gt;</code><span>add a new repository</span></div>
+      <div class="cmd-row"><code>zap list</code><span>list all installed packages</span></div>
+      <div class="cmd-row"><code>zap info &lt;pkg&gt;</code><span>show package details</span></div>
+      <div class="cmd-row"><code>zap help</code><span>show help message</span></div>
+      <div class="cmd-row"><code>zap config</code><span>configure zap settings</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <h2 class="section-title"><span class="title-accent">02</span> how it works</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div>
+          <p class="step-label">update</p>
+          <p class="step-desc">Downloads <code>index.zip</code> from each repository and extracts the package list.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div>
+          <p class="step-label">search</p>
+          <p class="step-desc">Looks up the package name in the index and writes the URL to <code>Packages.tmp</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div>
+          <p class="step-label">download</p>
+          <p class="step-desc">Downloads the <code>.zip</code> from the URL using multithreading.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div>
+          <p class="step-label">install</p>
+          <p class="step-desc">Moves the zip to the final folder, extracts it, and removes the archive.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PLATFORMS + ROADMAP -->
+  <section class="section two-col">
+    <div>
+      <h2 class="section-title"><span class="title-accent">03</span> platforms</h2>
+      <div class="platform-list">
+        <div class="platform-row">
+          <span class="os">Windows</span>
+          <span class="tag tag-yes">supported</span>
+          <span class="ver">v0.01</span>
+        </div>
+        <div class="platform-row">
+          <span class="os">Linux</span>
+          <span class="tag tag-yes">supported</span>
+          <span class="ver">v0.01</span>
+        </div>
+        <div class="platform-row">
+          <span class="os">macOS</span>
+          <span class="tag tag-wip">coming soon</span>
+          <span class="ver">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="section-title"><span class="title-accent">04</span> roadmap</h2>
+      <ul class="roadmap">
+        <li class="done">install</li>
+        <li class="done">download</li>
+        <li class="done">list</li>
+        <li class="done">remove</li>
+        <li>search</li>
+        <li>update / update-all</li>
+        <li>package metadata (info)</li>
+        <li>dependency resolution</li>
+        <li>install scripts</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <footer>
+    created by <a href="https://github.com/Bkner3/" target="_blank">Bernardo</a>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
