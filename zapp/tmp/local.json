@@ -1,0 +1,30 @@
+{
+  "repo": "local",
+  "updated": "2026-03-14",
+  "packages": [
+    {
+      "name": "bot",
+      "version": "1.0.0",
+      "description": "Bot package",
+      "url": "http://localhost:8000/packages/bot.zip"
+    },
+    {
+      "name": "ttp",
+      "version": "1.0.0",
+      "description": "TTP package",
+      "url": "http://localhost:8000/packages/ttp.zip"
+    },
+    {
+      "name": "rufus",
+      "version": "1.0.0",
+      "description": "Rufus package",
+      "url": "http://localhost:8000/packages/rufus.zip"
+    },
+    {
+      "name": "wget",
+      "version": "1.0.0",
+      "description": "Wget package",
+      "url": "http://localhost:8000/packages/wget.zip"
+    }
+  ]
+}

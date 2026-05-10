@@ -1,3 +1,5 @@
+import os
+
 from src.utils.json_utils import read_json
 from src.zap_path import PathManager
 from colorama import Style, Fore, init
@@ -17,6 +19,12 @@ def show_on_start():
                 print(f"{Style.BRIGHT} {logo}")
             else:
                 print(f"{Style.BRIGHT} {config.get('type_logo')}")
+
+    corversion = "0.05 Alpha"
+    print(Style.BRIGHT + Fore.GREEN + f"Zippy Asset Packager - {corversion}")
+    print(Fore.CYAN + "──────────────────────────────────────────\n")
+    tmp_path = PathManager.get("tmp")
+
 def show_help():
     help_info = f"""    Usage:
         {Fore.MAGENTA}zap {Fore.GREEN}<command> {Fore.CYAN}<package> {Fore.YELLOW}[options]{Fore.RESET}

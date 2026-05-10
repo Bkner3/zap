@@ -3,16 +3,8 @@ from colorama import Style, Fore
 from os import getenv
 
 def what_system():
-    if system() == "Windows":
-        return "Windows"
-    elif system() == "Linux":
-        return "Linux"
-    elif system() == "Darwin":
-        return "MacOS"
-    else:
-        return "Not_supported"
-    
-    
+    return system()
+      
 def get_user_path():
     if what_system() == "Windows":
         user = getenv("USERNAME")

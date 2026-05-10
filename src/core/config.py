@@ -1,17 +1,13 @@
 from src.utils.json_utils import save_json, read_json
-from colorama import Fore, Style
-from src.cli.parser import read_args
+from colorama import Fore
 from src.zap_path import PathManager
 
-
-packages, commands = read_args()
-
-def config_zap(commands):
+def config_zap(packages):
     config_file = PathManager.get("config_file")
     action = None
     target = None
 
-    for c in commands:
+    for c in packages:
         if c == "h":
             action = "hide"
         elif c == "s":

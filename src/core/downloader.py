@@ -75,7 +75,10 @@ def download_index(cfg):
 
     repos = cfg["repos"]
     tmp_path = cfg["tmp"]
-
+    
+    if repos is None:
+        print(Fore.YELLOW + "No repositories found. Please add repositories using 'zap add <repo_url>'.")
+        exit()
     for url in repos:
         name = url.replace("http://", "").replace("https://", "").rstrip("/")
         index_url = url.rstrip("/") + "/index.zip"

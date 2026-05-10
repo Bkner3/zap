@@ -1,0 +1,11 @@
+{
+  "packages": [
+    {
+      "name": "rufus",
+      "version": "1.0.0",
+      "description": "Rufus package",
+      "url": "http://localhost:8000/packages/rufus.zip",
+      "repo": "local"
+    }
+  ]
+}
