@@ -94,11 +94,11 @@ Repositories are defined in `zapp/repos.json`:
 
 ##  Supported Systems
 
-| OS      | Supported | Version |
-|---------|-----------|---------|
-| Windows | YES       |  0.01   |
-| Linux   | YES       |  0.01   |
-| macOS   | NO        |   n/a   | 
+| OS      | Supported |
+|---------|-----------|
+| Windows | YES       |
+| Linux   | YES       |
+| macOS   | NO        |
 
 ---
 
