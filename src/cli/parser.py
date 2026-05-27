@@ -7,6 +7,7 @@ from src.core.config import config_zap
 from src.core.install import install
 from src.core.remove import remove
 from src.core.list import list_packages
+from src.db.database import reset_db
 
 from src.cli.ui import show_on_start, show_help
 
@@ -46,6 +47,7 @@ def start(current_dir):
         "help": show_help,
         "config": lambda: config_zap(packages[0]),
         "update": lambda: print("Update not implemented yet"),
+        "reset-db": lambda:reset_db(),
     }
 
     if command not in commands:

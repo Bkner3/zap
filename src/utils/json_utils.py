@@ -8,7 +8,7 @@ def save_json(key, value, file_path):
     
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
-import json
+
 from os.path import exists
 
 def read_json(file_to_read):

@@ -22,7 +22,7 @@ class PathManager:
 
             # FILES (user)
             "installed_file": join(user_root, "data", "installed.json"),
-            "config_file": join(user_root, "data", "zap", "config.json"),
+            "config_file": join(user_root, "data", "config.json"),
 
             # ROOT (runtime)
             "root": root,

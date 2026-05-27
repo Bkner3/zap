@@ -1,32 +1,56 @@
+from os import listdir, makedirs, path, remove
+
 from src.core.downloader import only_download
 from src.utils.move_files import move_files
 from src.utils.create_launcher import create_launcher
 from src.utils.zip_utils import extract_zip
+from src.utils.json_utils import read_json
 from src.zap_path import PathManager
-from os import listdir, makedirs, path, remove
+from src.db.database import save_package
+
 
 def install(packages):
     only_download(packages)
+    print("\nDownload completed. Installing packages...")
+
     ext_path = PathManager.get("ext")
     bin_path = PathManager.get("bin")
     symlinks_path = PathManager.get("sl")
+    index_file = PathManager.get("tmp_packages")
+    index = read_json(index_file)
+    
+    for package in index["packages"]:
+        package_name = package["name"]
+        package_version = package["version"]
+        package_desc = package["description"]
 
-    for file in listdir(ext_path):
-        print(f"Installing {file}...")
-        pfile = path.join(ext_path, file)
-        name = path.splitext(file)[0]
-
-        final_folder = path.join(bin_path, name)
-        final_file = path.join(final_folder, file)
-
-        if not path.exists(final_folder):
-            makedirs(final_folder)
-
-        move_files(pfile, final_folder)
-        extract_zip(final_file, final_folder)
-        print(f"Extracted {name}.")
-        remove(final_file)
+        filename = f"{package_name}.zip"
+        file_path = path.join(ext_path, filename)
         
-        executable = path.join(final_folder, f"{name}.exe")
-        create_launcher(name, executable, symlinks_path)
-        print(f"Created launcher for {name}.")
+        print(f"\nInstalling {package_name}...")
+
+        install_folder = path.join(bin_path, package_name)
+        target_file = path.join(install_folder, filename)
+
+        if not path.exists(install_folder):
+            makedirs(install_folder, exist_ok=True)
+
+        move_files(file_path, install_folder)
+
+        extract_zip(target_file, install_folder)
+        print(f"Extracted {package_name}.")
+
+        remove(target_file)
+
+        executable_path = path.join(install_folder, f"{package_name}.exe")
+        create_launcher(package_name, executable_path, symlinks_path)
+
+        print(f"Created launcher for {package_name}.")
+
+        save_package(
+            package_name,
+            package_version,
+            package_desc
+        )
+        print(f"Saved {package_name} to database.")
+        print(f"Installed {package_name} successfully.")

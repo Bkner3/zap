@@ -2,28 +2,26 @@ import sqlite3
 import os
 from src.zap_path import PathManager
 
+DB_PATH = os.path.join(PathManager.get("data"), "zap.db")
 
-DB_PATH  = os.path.join(PathManager.get("data"), "zap.db")
 
 def get_connection():
     return sqlite3.connect(DB_PATH)
 
 
 def create_tables():
+    with get_connection() as conn:
+        cursor = conn.cursor()
 
-    conn = get_connection()
-    cursor = conn.cursor()
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS packages (
+            name TEXT PRIMARY KEY,
+            version TEXT,
+            description TEXT
+        )
+        """)
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS packages (
-        name TEXT PRIMARY KEY,
-        version TEXT,
-        description TEXT
-    )
-    """)
-
-    conn.commit()
-    conn.close()
+        conn.commit()
 
 
 def init_db():
@@ -38,12 +36,12 @@ def reset_db():
         print("Cancelled.")
         return
 
-    conn = get_connection()
-    cursor = conn.cursor()
+    with get_connection() as conn:
+        cursor = conn.cursor()
 
-    cursor.execute("DROP TABLE IF EXISTS packages")
-    conn.commit()
-    conn.close()
+        cursor.execute("DROP TABLE IF EXISTS packages")
+
+        conn.commit()
 
     init_db()
 
@@ -51,42 +49,87 @@ def reset_db():
 
 
 def recreate_db():
-    pass
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("DROP TABLE IF EXISTS packages")
+
+        conn.commit()
+
+    init_db()
+
+    print("Database recreated.")
 
 
 def save_package(name, version, description):
-    conn = get_connection()
-    cursor = conn.cursor()
+    with get_connection() as conn:
+        cursor = conn.cursor()
 
-    cursor.execute("""
-    INSERT INTO packages (name, version, description)
-    VALUES (?, ?, ?)
-    ON CONFLICT(name) DO UPDATE SET
-    version=excluded.version,
-    description=excluded.description
-    """, (name, version, description))
+        cursor.execute("""
+        INSERT INTO packages (name, version, description)
+        VALUES (?, ?, ?)
+        ON CONFLICT(name) DO UPDATE SET
+            version = excluded.version,
+            description = excluded.description
+        """, (name, version, description))
 
-    conn.commit()
-    conn.close()
+        conn.commit()
 
 
 def get_all_packages():
-    conn = get_connection()
-    cursor = conn.cursor()
+    with get_connection() as conn:
+        cursor = conn.cursor()
 
-    cursor.execute("SELECT name, version, description FROM packages")
-    rows = cursor.fetchall()
+        cursor.execute("""
+        SELECT name, version, description
+        FROM packages
+        """)
 
-    conn.close()
-    return rows
+        return cursor.fetchall()
 
 
 def get_package(name):
-    conn = get_connection()
-    cursor = conn.cursor()
+    with get_connection() as conn:
+        cursor = conn.cursor()
 
-    cursor.execute("SELECT name, version, description FROM packages WHERE name = ?", (name,))
-    row = cursor.fetchone()
+        cursor.execute("""
+        SELECT name, version, description
+        FROM packages
+        WHERE name = ?
+        """, (name,))
 
-    conn.close()
-    return row
+        return cursor.fetchone()
+
+"""
+# =========================
+# EXEMPLO DE USO
+# =========================
+
+init_db()
+
+# escrever na base de dados
+save_package(
+    "rufus",
+    "4.6",
+    "USB bootable creator"
+)
+
+save_package(
+    "git",
+    "2.49",
+    "Version control system"
+)
+
+# ler todos os packages
+packages = get_all_packages()
+
+print("\nPackages:")
+for pkg in packages:
+    print(pkg)
+
+# procurar package específico
+pkg = get_package("rufus")
+
+print("\nFound package:")
+print(pkg)
+"""

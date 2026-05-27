@@ -1,47 +1,41 @@
-PY=python
-PIP=pip
-ENTRY=zap.py
-APP_NAME=zap
+APP = zap.py
+PYTHON = python
+REQ_FILE = requirements.txt
 
-# Detecta sistema
-ifeq ($(OS),Windows_NT)
-    EXE=$(APP_NAME).exe
-    RUN_CMD=dist\\$(EXE)
-else
-    EXE=$(APP_NAME)
-    RUN_CMD=./dist/$(EXE)
-endif
+all: welcome choose 
 
-# Alvos fictícios (Evita conflitos com pastas de mesmo nome)
-.PHONY: all clean install build run
+welcome:
+	@$(PYTHON) -c "print('\n ███████╗ █████╗ ██████╗\n ╚══███╔╝██╔══██╗██╔══██╗\n   ███╔╝ ███████║██████╔╝\n  ███╔╝  ██╔══██║██╔═══╝\n ███████╗██║  ██║██║\n ╚══════╝╚═╝  ╚═╝╚═╝ PM\n\n Welcome zap makefile!\n')"
 
-# ----------------------------
-# DEFAULT
-# ----------------------------
-all: clean install build
+choose:
+	@$(PYTHON) -c "print('Choose a compiler:\n [1]PyInstaller (simpler but slower) \n [2]Nuitka (faster but more complex (requires gcc ))\n')"
+	@read -p "Enter your choice: " choice; \
+	if [ "$$choice" = "1" ]; then \
+		$(MAKE) compile_pyinstaller; \
+	elif [ "$$choice" = "2" ]; then \
+		$(MAKE) compile_nuitka; \
+	else \
+		echo "Invalid choice."; \
+	fi
 
-# ----------------------------
-# LIMPAR
-# ----------------------------
-clean:
-	-$(PY) -c "import shutil, os; [shutil.rmtree(x, ignore_errors=True) for x in ['build','dist','__pycache__']]"
-	-$(PY) -c "import os; [os.remove(f) for f in os.listdir('.') if f.endswith('.spec')]"
+compile_pyinstaller:
+	@$(PYTHON) -m pip install --upgrade pip
+	@$(PYTHON) -m pip install pyinstaller
+	@echo "Compiling with PyInstaller..."
+	@$(PYTHON) -m pip install -r $(REQ_FILE)
+	@$(PYTHON) -m PyInstaller --onefile --noconsole $(APP)
 
-# ----------------------------
-# INSTALAR DEPENDÊNCIAS
-# ----------------------------
-install:
-	$(PIP) install -r requirements.txt
-	$(PIP) install pyinstaller
+compile_nuitka:
+	@echo "Compiling with Nuitka..."
+	@$(PYTHON) -m pip install --upgrade pip
+	@$(PYTHON) -m pip install nuitka
+	@$(PYTHON) -m pip install -r $(REQ_FILE)
+	@$(PYTHON) -m nuitka --onefile --windows-disable-console $(APP)
 
-# ----------------------------
-# BUILD
-# ----------------------------
-build:
-	$(PY) -m PyInstaller --onefile --clean --noconfirm --name $(APP_NAME) $(ENTRY)
-
-# ----------------------------
-# RUN
-# ----------------------------
-run:
-	$(RUN_CMD)
+pyinstaller_clean:
+	@echo "Cleaning PyInstaller build files..."
+	@$(PYTHON) -c "import os, shutil; [shutil.rmtree(d) for d in ['build'] if os.path.exists(d)]; [os.remove(f) for f in os.listdir('.') if f.endswith('.spec')]"
+	
+nuitka_clean:
+	@echo "Cleaning Nuitka build files..."
+	@$(PYTHON) -c "import os, shutil; [shutil.rmtree(d) for d in ['__pycache__', 'build'] if os.path.exists(d)]; [os.remove(f) for f in os.listdir('.') if f.endswith('.bin')]"
