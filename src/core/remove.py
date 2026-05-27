@@ -2,13 +2,14 @@ from src.utils.sys_utils import what_system
 from src.zap_path import PathManager
 from os import path, unlink, remove as os_remove
 from shutil import rmtree
-
+from src.db.database import init_db, delete_package
 
 def remove(packages):
     bin_path = PathManager.get("bin")
     symlinks_path = PathManager.get("sl")
     system = what_system()
-
+    init_db()
+    
     for package in packages:
         package_path = path.join(bin_path, package)
 
@@ -31,5 +32,6 @@ def remove(packages):
         elif system == "Linux":
             if path.islink(launcher_path):
                 unlink(launcher_path)
-
+        
+        delete_package(package)
         print(f"Removed package: {package}")

@@ -100,36 +100,19 @@ def get_package(name):
 
         return cursor.fetchone()
 
-"""
-# =========================
-# EXEMPLO DE USO
-# =========================
 
-init_db()
+def delete_package(name):
+    with get_connection() as conn:
+        cursor = conn.cursor()
 
-# escrever na base de dados
-save_package(
-    "rufus",
-    "4.6",
-    "USB bootable creator"
-)
+        cursor.execute("""
+        DELETE FROM packages
+        WHERE name = ?
+        """, (name,))
 
-save_package(
-    "git",
-    "2.49",
-    "Version control system"
-)
+        conn.commit()
 
-# ler todos os packages
-packages = get_all_packages()
-
-print("\nPackages:")
-for pkg in packages:
-    print(pkg)
-
-# procurar package específico
-pkg = get_package("rufus")
-
-print("\nFound package:")
-print(pkg)
-"""
+        if cursor.rowcount > 0:
+            print(f"Package {name} removed from the database.")
+        else:
+            print(f"Package {name} not found on the database.")

@@ -1,104 +1,110 @@
+from threading import Thread
+from shutil import move
+from pathlib import Path
+
+import os
+import requests
+
+from tqdm import tqdm
+from colorama import Fore, Style
+
 from src.zap_path import PathManager
 from src.utils.json_utils import read_json
 from src.utils.zip_utils import extract_zip
 from src.core.search import search_repo_packages
-import os
-import requests
-from tqdm import tqdm
-from colorama import Fore, Style
-from threading import Thread
-from shutil import move
+
+
+CHUNK_SIZE = 4096
 
 
 def get_context():
     return {
-        "repos": read_json(PathManager.get("repos_file")).get("repos"),
+        "repos": read_json(PathManager.get("repos_file")).get("repos", []),
         "ext": PathManager.get("ext"),
         "download": PathManager.get("download"),
         "tmp": PathManager.get("tmp"),
-        "tmp_packages": PathManager.get("tmp_packages")
+        "tmp_packages": PathManager.get("tmp_packages"),
     }
 
 
 def download(url, output_name, file_type, cfg):
+    base_dir = cfg["download"] if file_type == "Index" else cfg["ext"]
 
-    base_path = cfg["ext"]
-    download_path = cfg["download"]
+    output_path = os.path.join(base_dir, output_name)
 
-    output = os.path.join(base_path, output_name)
+    with requests.get(url, stream=True) as response:
+        if response.status_code != 200:
+            if file_type != "Index":
+                print(Fore.RED + f"Failed to download: {url}")
+            return None
 
-    if file_type == "Index":
-        output = os.path.join(download_path, output_name)
+        total = int(response.headers.get("content-length", 0))
 
-    try:
-        r = requests.get(url, stream=True)
-        r.raise_for_status()
+        with open(output_path, "wb") as file, tqdm(
+            total=total if total > 0 else None,
+            unit="B",
+            unit_scale=True,
+            desc=output_name,
+            ncols=100,
+            ascii=" ━",
+            colour="white",
+            bar_format="{desc} {percentage:3.0f}% |{bar}| {n_fmt}/{total_fmt} @ {rate_fmt}",
+        ) as progress:
 
-    except requests.exceptions.ConnectionError:
-        if file_type != "Index":
-            print(Fore.RED + f"Error: could not connect to {url}")
-        return None
+            for chunk in response.iter_content(CHUNK_SIZE):
+                if not chunk:
+                    continue
 
-    except requests.exceptions.HTTPError as e:
-        if file_type != "Index":
-            print(Fore.RED + f"Error: {e}")
-        return None
+                file.write(chunk)
+                progress.update(len(chunk))
 
-    except requests.RequestException as e:
-        if file_type != "Index":
-            print(Fore.RED + f"Error downloading {url}: {e}")
-        return None
-
-    total = int(r.headers.get("content-length", 0))
-
-    with open(output, "wb") as f, tqdm(
-        total=total if total > 0 else None,
-        unit="B",
-        unit_scale=True,
-        desc=output_name,
-        bar_format="{desc} {percentage:3.0f}% |{bar}| {n_fmt}/{total_fmt} @ {rate_fmt}",
-        ncols=100,
-        colour="white",
-        ascii=" ━"
-    ) as bar:
-
-        for chunk in r.iter_content(4096):
-            if chunk:
-                f.write(chunk)
-                bar.update(len(chunk))
-
-    return output
+    return output_path
 
 
 def download_index(cfg):
-    print(Style.BRIGHT + Fore.BLUE + "Starting to download repositories index\n")
+    print(Style.BRIGHT + Fore.BLUE + "Starting repository index update\n")
 
     repos = cfg["repos"]
     tmp_path = cfg["tmp"]
-    
-    if repos is None:
-        print(Fore.YELLOW + "No repositories found. Please add repositories using 'zap add <repo_url>'.")
-        exit()
-    for url in repos:
-        name = url.replace("http://", "").replace("https://", "").rstrip("/")
-        index_url = url.rstrip("/") + "/index.zip"
 
-        print(f"Updating: {index_url}")
+    if not repos:
+        print(Fore.YELLOW + "No repositories configured.")
+        return
 
-        temp_zip = download(index_url, f"{name}.zip", "Index", cfg)
+    for repo_url in repos:
+        repo_name = (
+            repo_url.replace("http://", "")
+            .replace("https://", "")
+            .rstrip("/")
+        )
 
-        if not temp_zip:
-            print(Fore.YELLOW + f"Repository {url} is not available, jumping to next one.")
+        index_url = f"{repo_url.rstrip('/')}/index.zip"
+
+        print(f"\nUpdating: {index_url}")
+
+        zip_path = download(
+            index_url,
+            f"{repo_name}.zip",
+            "Index",
+            cfg
+        )
+
+        if not zip_path:
+            print(Fore.YELLOW + f"Skipping repository: {repo_url}")
             continue
 
-        extract_zip(temp_zip, tmp_path)
-        os.remove(temp_zip)
+        extract_zip(zip_path, tmp_path)
+        os.remove(zip_path)
 
         index_file = os.path.join(tmp_path, "index.json")
 
+        if not os.path.exists(index_file):
+            continue
+
         data = read_json(index_file)
 
-        final_path = os.path.join(tmp_path, f"{data.get('repo', 'unknown')}.json")
+        final_name = f"{data.get('repo', 'unknown')}.json"
+        final_path = os.path.join(tmp_path, final_name)
 
         if os.path.exists(final_path):
             os.remove(final_path)
@@ -114,39 +120,55 @@ def only_download(packages):
 
     search_repo_packages(packages)
 
-    tmp_packages_file = cfg["tmp_packages"]
+    packages_file = cfg["tmp_packages"]
 
-    if not os.path.exists(tmp_packages_file):
-        print(Fore.YELLOW + "No packages found to download.")
+    if not os.path.exists(packages_file):
+        print(Fore.YELLOW + "No packages found.")
         return
 
-    data = read_json(tmp_packages_file)
+    data = read_json(packages_file)
     packages_to_download = data.get("packages", [])
 
     if not packages_to_download:
-        print(Fore.YELLOW + "No packages found to download.")
+        print(Fore.YELLOW + "No packages found.")
         return
 
     threads = []
 
-    for pkg in packages_to_download:
-        url = pkg["url"]
-        name = pkg["name"]
+    for package in packages_to_download:
+        url = package["url"]
+        name = package["name"]
 
-        ext = os.path.splitext(url)[1]
-        output_name = f"{name}{ext}"
+        extension = Path(url).suffix
+        output_name = f"{name}{extension}"
 
-        t = Thread(target=download, args=(url, output_name, "Package", cfg))
-        t.start()
-        threads.append(t)
+        thread = Thread(
+            target=download,
+            args=(url, output_name, "Package", cfg)
+        )
 
-    for t in threads:
-        t.join()
+        thread.start()
+        threads.append(thread)
+
+    for thread in threads:
+        thread.join()
 
 
 def download_to(packages, destination):
     cfg = get_context()
+
     ext_path = cfg["ext"]
+
+    before = set(os.listdir(ext_path))
+
     only_download(packages)
-    for file in os.listdir(ext_path):
-        move(os.path.join(ext_path, file), os.path.join(destination, file))
+
+    after = set(os.listdir(ext_path))
+
+    new_files = after - before
+
+    for file_name in new_files:
+        source = os.path.join(ext_path, file_name)
+        target = os.path.join(destination, file_name)
+
+        move(source, target)
