@@ -24,7 +24,7 @@ SOFTWARE.
 """
 """
 Zippy Asset Packager - A simple package manager
-#Version: 0.01 Alpha
+#Version: 0.5.0-beta
 Github: https://github.com/Bkner3/zap
 This project is in early development, expect bugs and missing features.
 """
@@ -46,7 +46,7 @@ PathManager.setup(root)
 from src.utils.write_logs import setup_logger, log_info, log_warning, log_error, log_debug
 from src.cli.parser import start
 
-corversion = "0.01 Alpha"
+corversion = "0.5.0-beta"
 current_dir = os.getcwd()
 tmp_path = PathManager.get("tmp")
 
