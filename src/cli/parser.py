@@ -35,7 +35,7 @@ def read_args():
     return args.command, args.packages
 
 
-def start(current_dir):
+def start(current_dir, corversion):
     command, packages = read_args()
 
     commands = {
@@ -48,11 +48,12 @@ def start(current_dir):
         "config": lambda: config_zap(packages[0]),
         "update": lambda: print("Update not implemented yet"),
         "reset-db": lambda:reset_db(),
+        "version": lambda: """The show_on_start function already shows the version, so we don't need to do anything here. print("") just to avoid syntax error""",
     }
 
     if command not in commands:
         print("Use: zap help")
         return
 
-    show_on_start()
+    show_on_start(corversion)
     commands[command]()
