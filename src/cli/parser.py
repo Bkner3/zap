@@ -8,6 +8,7 @@ from src.core.install import install
 from src.core.remove import remove
 from src.core.list import list_packages
 from src.db.database import reset_db
+from src.core.open_tools import open_tools
 
 from src.cli.ui import show_on_start, show_help
 
@@ -49,6 +50,7 @@ def start(current_dir, corversion):
         "update": lambda: print("Update not implemented yet"),
         "reset-db": lambda:reset_db(),
         "version": lambda: """The show_on_start function already shows the version, so we don't need to do anything here. print("") just to avoid syntax error""",
+        "open-tools": lambda: open_tools()
     }
 
     if command not in commands:

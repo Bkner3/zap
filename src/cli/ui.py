@@ -1,6 +1,6 @@
 import os
 
-from src.utils.json_utils import read_json
+from src.core.config import read_config
 from src.zap_path import PathManager
 from colorama import Style, Fore, init
 init(autoreset=True)
@@ -13,7 +13,7 @@ def show_on_start(corversion):
      ███╔╝  ██╔══██║██╔═══╝
     ███████╗██║  ██║██║
     ╚══════╝╚═╝  ╚═╝╚═╝ PM"""
-    config = read_json(PathManager.get("config_file"))
+    config = read_config()
     if config.get("show_logo", True):
             if config.get("type_logo", "original") == "original":
                 print(f"{Style.BRIGHT} {logo}")

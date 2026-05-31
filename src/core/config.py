@@ -1,9 +1,13 @@
+import json
+
 from src.utils.json_utils import save_json, read_json
 from colorama import Fore
 from src.zap_path import PathManager
+from os.path import exists
 
 def config_zap(packages):
     config_file = PathManager.get("config_file")
+
     action = None
     target = None
 
@@ -41,6 +45,18 @@ def apply_config(action, target, config_file):
             print(Fore.YELLOW + "Logo: " + Fore.GREEN + "Custom")
             save_json("type_logo", new_logo.replace("\\n", "\n"), config_file)
 
-def read_config(config_file):
+def read_config():
+    default_config = {
+        "show_logo": True,
+        "type_logo": "original",
+        "is_on_tools": False
+    }
+
+    config_file = PathManager.get("config_file")
+
+    if not exists(config_file):
+        with open(config_file, "w", encoding="utf-8") as f:
+            json.dump(default_config, f, indent=2)
+        
     config = read_json(config_file)
     return config
