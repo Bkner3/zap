@@ -15,7 +15,8 @@ from src.core.search import search_repo_packages
 
 
 CHUNK_SIZE = 4096
-
+downloaded = []
+failed = []
 
 def get_context():
     return {
@@ -31,38 +32,41 @@ def download(url, output_name, file_type, cfg):
     base_dir = cfg["download"] if file_type == "Index" else cfg["ext"]
 
     output_path = os.path.join(base_dir, output_name)
+    try:
+        with requests.get(url, stream=True) as response:
+            if response.status_code != 200:
+                if file_type != "Index":
+                    print(Fore.RED + f"Failed to download: {url}")
+                return None
 
-    with requests.get(url, stream=True) as response:
-        if response.status_code != 200:
-            if file_type != "Index":
-                print(Fore.RED + f"Failed to download: {url}")
-            return None
+            total = int(response.headers.get("content-length", 0))
 
-        total = int(response.headers.get("content-length", 0))
+            with open(output_path, "wb") as file, tqdm(
+                total=total if total > 0 else None,
+                unit="B",
+                unit_scale=True,
+                desc=output_name,
+                ncols=100,
+                ascii=" ━",
+                colour="white",
+                bar_format="{desc} {percentage:3.0f}% |{bar}| {n_fmt}/{total_fmt} @ {rate_fmt}",
+            ) as progress:
 
-        with open(output_path, "wb") as file, tqdm(
-            total=total if total > 0 else None,
-            unit="B",
-            unit_scale=True,
-            desc=output_name,
-            ncols=100,
-            ascii=" ━",
-            colour="white",
-            bar_format="{desc} {percentage:3.0f}% |{bar}| {n_fmt}/{total_fmt} @ {rate_fmt}",
-        ) as progress:
+                for chunk in response.iter_content(CHUNK_SIZE):
+                    if not chunk:
+                        continue
 
-            for chunk in response.iter_content(CHUNK_SIZE):
-                if not chunk:
-                    continue
-
-                file.write(chunk)
-                progress.update(len(chunk))
+                    file.write(chunk)
+                    progress.update(len(chunk))
+    except requests.RequestException:
+        print(Fore.RED + f"Error downloading: {url}")
+        return None
 
     return output_path
 
 
 def download_index(cfg):
-    print(Style.BRIGHT + Fore.BLUE + "Starting repository index update\n")
+    print(Style.BRIGHT + Fore.BLUE + "Starting repository index update")
 
     repos = cfg["repos"]
     tmp_path = cfg["tmp"]
@@ -111,30 +115,23 @@ def download_index(cfg):
 
         os.rename(index_file, final_path)
 
-
 def only_download(packages):
     cfg = get_context()
 
     download_index(cfg)
-    print()
 
-    search_repo_packages(packages)
-
-    packages_file = cfg["tmp_packages"]
-
-    if not os.path.exists(packages_file):
-        print(Fore.YELLOW + "No packages found.")
-        return
-
-    data = read_json(packages_file)
+    data = search_repo_packages(packages)
     packages_to_download = data.get("packages", [])
+    missing = data.get("missing", [])
 
     if not packages_to_download:
         print(Fore.YELLOW + "No packages found.")
-        return
+        return {"downloaded": [], "failed": packages, "missing": missing}
 
     threads = []
-
+    downloaded = []
+    failed = []
+    print(Style.BRIGHT + Fore.BLUE + "\nStarting package download\n")
     for package in packages_to_download:
         url = package["url"]
         name = package["name"]
@@ -143,8 +140,8 @@ def only_download(packages):
         output_name = f"{name}{extension}"
 
         thread = Thread(
-            target=download,
-            args=(url, output_name, "Package", cfg)
+            target=download_worker,
+            args=(url, output_name, cfg, downloaded, failed, name)
         )
 
         thread.start()
@@ -153,8 +150,15 @@ def only_download(packages):
     for thread in threads:
         thread.join()
 
+    return {
+        "downloaded": downloaded,
+        "failed": failed,
+        "missing": missing
+    }
+    
 
 def download_to(packages, destination):
+
     cfg = get_context()
 
     ext_path = cfg["ext"]
@@ -172,3 +176,11 @@ def download_to(packages, destination):
         target = os.path.join(destination, file_name)
 
         move(source, target)
+
+def download_worker(url, output_name, cfg, downloaded, failed, name):
+    result = download(url, output_name, "Package", cfg)
+
+    if result and os.path.exists(result):
+        downloaded.append(name)
+    else:
+        failed.append(name)

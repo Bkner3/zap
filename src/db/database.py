@@ -62,6 +62,7 @@ def recreate_db():
 
 
 def save_package(name, version, description):
+    init_db()
     with get_connection() as conn:
         cursor = conn.cursor()
 
@@ -77,6 +78,7 @@ def save_package(name, version, description):
 
 
 def get_all_packages():
+    init_db()
     with get_connection() as conn:
         cursor = conn.cursor()
 
@@ -89,6 +91,7 @@ def get_all_packages():
 
 
 def get_package(name):
+    init_db()
     with get_connection() as conn:
         cursor = conn.cursor()
 
@@ -102,6 +105,7 @@ def get_package(name):
 
 
 def delete_package(name):
+    init_db()
     with get_connection() as conn:
         cursor = conn.cursor()
 

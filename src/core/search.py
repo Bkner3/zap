@@ -1,19 +1,26 @@
 from os import path, remove, listdir
+
+from colorama import Fore, init
 from src.zap_path import PathManager
 from src.utils.json_utils import read_json
-from json import dump
+
+init(autoreset=True)
+
+tmp_packages_file = PathManager.get("tmp_packages")
+tmp_path = PathManager.get("tmp")
+
+from os import path, remove, listdir
+from src.zap_path import PathManager
+from src.utils.json_utils import read_json
 
 tmp_packages_file = PathManager.get("tmp_packages")
 tmp_path = PathManager.get("tmp")
 
 def search_repo_packages(packages):
+    tmp_path = PathManager.get("tmp")
 
-    if path.exists(tmp_packages_file):
-        remove(tmp_packages_file)
-
-    todos_encontrados = []
-
-    print("Downloading packages:")
+    all_found_packages = []
+    found = set()
 
     for file in listdir(tmp_path):
         if file.endswith(".json"):
@@ -22,11 +29,9 @@ def search_repo_packages(packages):
             for pkg in data.get("packages", []):
                 if pkg["name"] in packages:
                     pkg["repo"] = data.get("repo", "unknown")
-                    todos_encontrados.append(pkg)
+                    all_found_packages.append(pkg)
+                    found.add(pkg["name"])
 
-    resultado = {
-        "packages": todos_encontrados
-    }
+    missing = set(packages) - found
 
-    with open(tmp_packages_file, "w", encoding="utf-8") as f:
-        dump(resultado, f, indent=2, ensure_ascii=False)
+    return {"packages": all_found_packages, "missing": list(missing)}

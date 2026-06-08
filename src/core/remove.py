@@ -5,6 +5,9 @@ from shutil import rmtree
 from src.db.database import init_db, delete_package
 
 def remove(packages):
+    if not packages:
+        print("No packages specified. Use: zap remove <package>\n")
+        return
     bin_path = PathManager.get("bin")
     symlinks_path = PathManager.get("sl")
     system = what_system()
