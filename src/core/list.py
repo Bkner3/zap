@@ -1,5 +1,4 @@
 
-from os import listdir
 from src.db.database import get_all_packages
 
 def list_packages():

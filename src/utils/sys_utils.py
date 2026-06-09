@@ -1,18 +1,15 @@
 from platform import system
 from colorama import Style, Fore
 from os import getenv
-
-def what_system():
-    return system()
       
 def get_user_path():
-    if what_system() == "Windows":
+    if system() == "Windows":
         user = getenv("USERNAME")
         return f"C:\\Users\\{user}\\AppData\\Local\\Zap"
-    elif what_system() == "Linux":
+    elif system() == "Linux":
         user = getenv("USER")
         return f"/home/{user}/.zap/"
-    elif what_system() == "MacOS":
+    elif system() == "MacOS":
         print(Style.BRIGHT + Fore.RED + "Say no to mac!")
         exit()
     else:

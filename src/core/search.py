@@ -1,4 +1,4 @@
-from os import path, remove, listdir
+from os import path, listdir
 
 from colorama import Fore, init
 from src.zap_path import PathManager

@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-python "$(dirname "$0")/zap.py" "$@"
+python3 "$(dirname "$0")/zap.py" "$@"

@@ -1,0 +1,8 @@
+#Forces the zap script to always use LF line endings, even on Windows
+zap text eol=lf
+
+#Forces the zap.bat script to always use CRLF line endings, even on Unix-based systems
+zap.bat text eol=crlf
+
+# Let Git manage the rest of the files (.py, .md, etc.) automatically
+*.py text

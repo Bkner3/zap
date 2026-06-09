@@ -1,14 +1,14 @@
-from os import listdir, makedirs, path, remove
+from os import makedirs, path, remove
 
 from src.core.downloader import only_download
 from src.utils.move_files import move_files
-from src.utils.create_launcher import create_launcher
+from src.utils.launcher import create_launcher
 from src.utils.zip_utils import extract_zip
-from src.utils.json_utils import read_json
 from src.zap_path import PathManager
 from src.db.database import save_package
 from src.core.search import search_repo_packages
 from colorama import Fore, init
+from platform import system
 
 init(autoreset=True)
 
@@ -53,11 +53,14 @@ def install(packages):
         move_files(file_path, install_folder)
 
         extract_zip(target_file, install_folder)
-        print(f"Extracted {package_name}.")
 
         remove(target_file)
 
-        executable_path = path.join(install_folder, f"{package_name}.exe")
+        if system() == "Windows":
+            executable_path = path.join(install_folder, f"{package_name}.exe")
+        else:
+            executable_path = path.join(install_folder, package_name)
+
         create_launcher(package_name, executable_path, symlinks_path)
 
         print(f"Created launcher for {package_name}.")

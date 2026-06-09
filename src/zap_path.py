@@ -49,7 +49,6 @@ class PathManager:
         """Returns a specific path without needing the root variable."""
         if not cls._initialized:
             raise ValueError("The PathManager has not been initialized! Call PathManager.setup(root) at the beginning of the program.")
-        
         if key not in cls._paths:
             raise KeyError(f"The path '{key}' does not exist in the PathManager.")
             
