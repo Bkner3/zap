@@ -1,10 +1,6 @@
 from os import path, listdir
-
-from colorama import Fore, init
 from src.zap_path import PathManager
 from src.utils.json_utils import read_json
-
-init(autoreset=True)
 
 tmp_packages_file = PathManager.get("tmp_packages")
 tmp_path = PathManager.get("tmp")
