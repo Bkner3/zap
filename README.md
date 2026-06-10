@@ -38,17 +38,16 @@ zap <command> [package]
 
 ## Commands
 
-| Command      | Description                              |
-|--------------|------------------------------------------|
-| `install`    | Install a package                        |
-| `remove`     | Remove a package                         |
-| `download`   | Download a package without installing    |
-| `update`     | Update a specific package                |
-| `update-all` | Update all installed packages            |
-| `search`     | Search for packages in the repository    |
-| `list`       | List all installed packages              |
-| `info`       | Show detailed information about a package|
-| `help`       | Show this help message                   |
+| Command      | Description                              ||
+|--------------|------------------------------------------|--------------------|
+| `install`    | Install a package                        |    Implemented     |
+| `remove`     | Remove a package                         |    Implemented     |
+| `download`   | Download a package without installing    |    Implemented     |
+| `update`     | Update a specific package                | Not implemented yet|
+| `update-all` | Update all installed packages            | Not implemented yet|
+| `list`       | List all installed packages              |    Implemented     |
+| `info`       | Show detailed information about a package| Not implemented yet|
+| `help`       | Show this help message                   |    Implemented     |
 
 ---
 
@@ -56,9 +55,8 @@ zap <command> [package]
 
 ```
 zapp/
-├── core/       # Core files
-├── down/       # Temporary index downloads
-├── ext/        # Downloaded package zips (before install)
+├── down/       # The download directory
+├── ext/        # Used for logic 
 └── tmp/        # Temporary files and package index cache
 
 ~/.zap/         # (Linux)
