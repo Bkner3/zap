@@ -1,13 +1,7 @@
 from os import path, listdir
 from src.zap_path import PathManager
 from src.utils.json_utils import read_json
-
-tmp_packages_file = PathManager.get("tmp_packages")
-tmp_path = PathManager.get("tmp")
-
-from os import path, remove, listdir
-from src.zap_path import PathManager
-from src.utils.json_utils import read_json
+from os import path, listdir
 
 tmp_packages_file = PathManager.get("tmp_packages")
 tmp_path = PathManager.get("tmp")
