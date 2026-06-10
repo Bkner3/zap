@@ -12,6 +12,7 @@ from src.zap_path import PathManager
 from src.utils.json_utils import read_json
 from src.utils.zip_utils import extract_zip
 from src.core.search import search_repo_packages
+from src.utils.write_logs import *
 
 
 CHUNK_SIZE = 4096
@@ -19,6 +20,7 @@ downloaded = []
 failed = []
 
 def get_context():
+    log_info("Setting and returning the download context.")
     return {
         "repos": read_json(PathManager.get("repos_file")).get("repos", []),
         "ext": PathManager.get("ext"),
@@ -32,15 +34,17 @@ def download(url, output_name, file_type, cfg):
     base_dir = cfg["download"] if file_type == "Index" else cfg["ext"]
 
     output_path = os.path.join(base_dir, output_name)
+    log_info(f"Output Directory: {output_path}")
     try:
         with requests.get(url, stream=True) as response:
             if response.status_code != 200:
                 if file_type != "Index":
+                    log_error(f"Failed to download: {url}")
                     print(Fore.RED + f"Failed to download: {url}")
                 return None
+            
 
             total = int(response.headers.get("content-length", 0))
-
             with open(output_path, "wb") as file, tqdm(
                 total=total if total > 0 else None,
                 unit="B",
@@ -59,19 +63,22 @@ def download(url, output_name, file_type, cfg):
                     file.write(chunk)
                     progress.update(len(chunk))
     except requests.RequestException:
+        print(f"Error download: {url}")
         print(Fore.RED + f"Error downloading: {url}")
         return None
-
+    log_info(f"This url ({url}) was download")
     return output_path
 
 
 def download_index(cfg):
+    log_info("Starting repository index update")
     print(Style.BRIGHT + Fore.BLUE + "Starting repository index update")
 
     repos = cfg["repos"]
     tmp_path = cfg["tmp"]
 
     if not repos:
+        log_warning("No repositories configured.")
         print(Fore.YELLOW + "No repositories configured.")
         return
 
@@ -83,7 +90,7 @@ def download_index(cfg):
         )
 
         index_url = f"{repo_url.rstrip('/')}/index.zip"
-
+        log_info(f"Updating: {index_url}")
         print(f"\nUpdating: {index_url}")
 
         zip_path = download(
@@ -92,21 +99,24 @@ def download_index(cfg):
             "Index",
             cfg
         )
+        log_debug(f"Index zip path: {zip_path}")
 
         if not zip_path:
+            log_warning("Skipping repository: {repo_url}")
             print(Fore.YELLOW + f"Skipping repository: {repo_url}")
             continue
 
         extract_zip(zip_path, tmp_path)
+        log_info(f"Removing: {zip_path}")
         os.remove(zip_path)
 
         index_file = os.path.join(tmp_path, "index.json")
-
+        
         if not os.path.exists(index_file):
             continue
 
         data = read_json(index_file)
-
+        log_info(f"Reading a repo name")
         final_name = f"{data.get('repo', 'unknown')}.json"
         final_path = os.path.join(tmp_path, final_name)
 
@@ -114,6 +124,7 @@ def download_index(cfg):
             os.remove(final_path)
 
         os.rename(index_file, final_path)
+        log_info(f"Renaming {index_file} to {final_path}")
 
 def only_download(packages):
     cfg = get_context()
@@ -155,7 +166,7 @@ def only_download(packages):
         "failed": failed,
         "missing": missing
     }
-    
+
 
 def download_to(packages, destination):
 
@@ -176,6 +187,7 @@ def download_to(packages, destination):
         target = os.path.join(destination, file_name)
 
         move(source, target)
+
 
 def download_worker(url, output_name, cfg, downloaded, failed, name):
     result = download(url, output_name, "Package", cfg)

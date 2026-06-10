@@ -1,26 +1,23 @@
-import logging
-import os
+from src.zap_path import PathManager
 
-def setup_logger(log_file):
-    os.makedirs(os.path.dirname(log_file), exist_ok=True)
-    
-    logging.basicConfig(
-        filename=log_file,
-        level=logging.DEBUG,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    )
-    
-    return logging.getLogger("zap")
+log_file = PathManager.get("log_file")
+def write_log(message, level="INFO"):
+    with open(log_file, "a", encoding="utf-8") as log:
+        log.write(f"[{level}] {message}\n")
 
-def log_info(logger, message):
-    logger.info(message)
+def log_info(message):
+    write_log(message, "INFO")
 
-def log_warning(logger, message):
-    logger.warning(message)
+def log_warning(message):
+    write_log(message, "WARNING")
 
-def log_error(logger, message):
-    logger.error(message)
+def log_error(message):
+    write_log(message, "ERROR")
 
-def log_debug(logger, message):
-    logger.debug(message)
+def log_debug(message):
+    from src.core.config import read_config
+    config = read_config()
+    if not config.get("is_on_debug", True):
+        return
+    write_log(message, "DEBUG")
+        

@@ -1,7 +1,4 @@
-import os
-
 from src.core.config import read_config
-from src.zap_path import PathManager
 from colorama import Style, Fore, init
 init(autoreset=True)
 
@@ -22,7 +19,6 @@ def show_on_start(corversion):
 
     print(Style.BRIGHT + Fore.GREEN + f"Zippy Asset Packager - {corversion}")
     print(Fore.CYAN + "──────────────────────────────────────────")
-    tmp_path = PathManager.get("tmp")
 
 def show_help():
     help_info = f"""    Usage:

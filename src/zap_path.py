@@ -23,6 +23,7 @@ class PathManager:
             # FILES (user)
             "installed_file": join(user_root, "data", "installed.json"),
             "config_file": join(user_root, "data", "config.json"),
+            "log_file": join(user_root, "data", "zap.log"),
 
             # ROOT (runtime)
             "root": root,
@@ -32,14 +33,13 @@ class PathManager:
             "tmp": join(root, "zapp", "tmp"),
 
             # Files (runtime)
-            "log_file": join(root, "zapp", "logs", "zap.log"),
             "repos_file": join(root, "zapp", "repos.json"),
             "tmp_packages": join(root, "zapp", "tmp", "Packages_tmp.json")
         }
 
         # Creates folders automatically (directories only, not files)
         for key, path in cls._paths.items():
-            if not path.endswith(".json"):
+            if not path.endswith(".json") and not path.endswith(".log"):
                 makedirs(path, exist_ok=True)
         
         cls._initialized = True

@@ -9,13 +9,17 @@ from src.core.remove import remove
 from src.core.list import list_packages
 from src.db.database import reset_db
 from src.core.open_tools import open_tools
+from src.core.update import update
+from src.utils.write_logs import log_info, log_error
 
 from src.cli.ui import show_on_start, show_help
 
 
 def read_args():
+    log_info("Reading command line arguments.")
     if len(argv) < 2:
         print("Use: zap <command> <package>")
+        log_error("No command provided.")
         exit()
 
     parser = argparse.ArgumentParser(description="Zap package manager")
@@ -37,6 +41,7 @@ def read_args():
 
 
 def start(current_dir, corversion):
+    log_info("Starting the parser module.")
     command, packages = read_args()
 
     commands = {
@@ -47,7 +52,7 @@ def start(current_dir, corversion):
         "list": list_packages,
         "help": show_help,
         "config": lambda: config_zap(packages[0]),
-        "update": lambda: print("Update not implemented yet"),
+        "update": lambda: update(),
         "reset-db": lambda:reset_db(),
         "version": lambda: """The show_on_start function already shows the version, so we don't need to do anything here. print("") just to avoid syntax error""",
         "open-tools": lambda: open_tools()
@@ -55,7 +60,9 @@ def start(current_dir, corversion):
 
     if command not in commands:
         print("Use: zap help")
+        log_error("Invalid command provided.")
         return
 
     show_on_start(corversion)
+    log_info(f"Executing {command} with packages or args: {packages}")
     commands[command]()

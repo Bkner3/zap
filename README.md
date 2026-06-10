@@ -1,4 +1,4 @@
-  # ZAP — Zippy Asset Packager
+# ZAP — Zippy Asset Packager
 
 ```
 ███████╗ █████╗ ██████╗
@@ -22,6 +22,7 @@
   - `colorama`
 
 Install dependencies:
+
 ```bash
 pip install requests tqdm colorama
 ```
@@ -38,16 +39,15 @@ zap <command> [package]
 
 ## Commands
 
-| Command      | Description                              ||
-|--------------|------------------------------------------|--------------------|
-| `install`    | Install a package                        |    Implemented     |
-| `remove`     | Remove a package                         |    Implemented     |
-| `download`   | Download a package without installing    |    Implemented     |
-| `update`     | Update a specific package                | Not implemented yet|
-| `update-all` | Update all installed packages            | Not implemented yet|
-| `list`       | List all installed packages              |    Implemented     |
-| `info`       | Show detailed information about a package| Not implemented yet|
-| `help`       | Show this help message                   |    Implemented     |
+| Command    | Description                               |                     |
+| ---------- | ----------------------------------------- | ------------------- |
+| `install`  | Install a package                         | Implemented         |
+| `remove`   | Remove a package                          | Implemented         |
+| `download` | Download a package without installing     | Implemented         |
+| `update`   | Update a specific package                 | Not implemented yet |
+| `list`     | List all installed packages               | Implemented         |
+| `info`     | Show detailed information about a package | Not implemented yet |
+| `help`     | Show this help message                    | Implemented         |
 
 ---
 
@@ -56,7 +56,7 @@ zap <command> [package]
 ```
 zapp/
 ├── down/       # The download directory
-├── ext/        # Used for logic 
+├── ext/        # Used for logic
 └── tmp/        # Temporary files and package index cache
 
 ~/.zap/         # (Linux)
@@ -73,9 +73,7 @@ Repositories are defined in `zapp/repos.json`:
 
 ```json
 {
-  "repos": [
-    "http://localhost:8000"
-  ]
+  "repos": ["http://localhost:8000"]
 }
 ```
 
@@ -90,10 +88,10 @@ Repositories are defined in `zapp/repos.json`:
 
 ---
 
-##  Supported Systems
+## Supported Systems
 
 | OS      | Supported |
-|---------|-----------|
+| ------- | --------- |
 | Windows | YES       |
 | Linux   | YES       |
 | macOS   | NO        |

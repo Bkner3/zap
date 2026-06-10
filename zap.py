@@ -44,10 +44,10 @@ else:
 
 PathManager.setup(root)
 # Initialize the path manager with the root directory 
-# #if you do not initialize it, the program will crash and will not work properly.
+# If you do not initialize it, the program will crash and will not work properly.
 
 #ZAP ESSENCIAL IMPORTS 
-from src.utils.write_logs import setup_logger, log_info, log_warning, log_error, log_debug
+from src.utils.write_logs import log_info, log_warning, log_error, log_debug
 from src.cli.parser import start
 
 #ZAP STARTING
@@ -55,6 +55,13 @@ corversion = "0.5.0-beta"
 current_dir = os.getcwd()
 tmp_path = PathManager.get("tmp")
 
+#First logs
+log_info(f"Zap {corversion}")
+log_info(f"Current directory: {current_dir}")
+log_debug(f"App: {sys.executable} File: {__file__}")
+
+#Check if tmp directory exists and is clean
+log_info("Starting to check if tmp directory exists and is clean.")
 if os.path.exists(tmp_path):
     shutil.rmtree(tmp_path)
     os.makedirs(tmp_path)
