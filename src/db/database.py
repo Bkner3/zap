@@ -1,6 +1,7 @@
 import sqlite3
 import os
 from src.zap_path import PathManager
+from src.utils.write_logs import log_info, log_warning, log_debug
 
 DB_PATH = os.path.join(PathManager.get("data"), "zap.db")
 
@@ -10,6 +11,7 @@ def get_connection():
 
 
 def create_tables():
+    log_info("Creating the DataBase tables.")
     with get_connection() as conn:
         cursor = conn.cursor()
 
@@ -25,14 +27,17 @@ def create_tables():
 
 
 def init_db():
+    log_info("Inicializing the DataBase")
     create_tables()
 
 
 def reset_db():
+    log_warning("reset_db was called. If confirmed by the user, the database will be reset.")
     print("This will reset the database, all package information will be lost.")
     confirm = input("Are you sure? (y/n): ").strip().lower()
 
     if confirm != "y":
+        log_info("Cancelled")
         print("Cancelled.")
         return
 
@@ -45,6 +50,7 @@ def reset_db():
 
     init_db()
 
+    log_warning("Database reset completed")
     print("\nDatabase reset completed")
 
 
@@ -57,12 +63,13 @@ def recreate_db():
         conn.commit()
 
     init_db()
-
+    log_info("Database recreated.")
     print("Database recreated.")
 
 
 def save_package(name, version, description):
     init_db()
+    log_info(f"Saving the {name}, {version} to the DataBase")
     with get_connection() as conn:
         cursor = conn.cursor()
 
@@ -79,6 +86,7 @@ def save_package(name, version, description):
 
 def get_all_packages():
     init_db()
+    log_info("Returning all packages registered in the database")
     with get_connection() as conn:
         cursor = conn.cursor()
 
@@ -92,6 +100,7 @@ def get_all_packages():
 
 def get_package(name):
     init_db()
+
     with get_connection() as conn:
         cursor = conn.cursor()
 
@@ -101,7 +110,14 @@ def get_package(name):
         WHERE name = ?
         """, (name,))
 
-        return cursor.fetchone()
+        result = cursor.fetchone()
+
+        if result:
+            log_info(f"Returning information for package '{name}'")
+        else:
+            log_warning(f"Package '{name}' not found")
+
+        return result
 
 
 def delete_package(name):
@@ -117,6 +133,8 @@ def delete_package(name):
         conn.commit()
 
         if cursor.rowcount > 0:
+            log_info(f"Package {name} removed from the database.")
             print(f"Package {name} removed from the database.")
         else:
+            log_warning(f"Package {name} not found on the database.")
             print(f"Package {name} not found on the database.")

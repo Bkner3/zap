@@ -77,12 +77,75 @@ Repositories are defined in `zapp/repos.json`:
 }
 ```
 
----
+# Create a repositoriy
 
-## How It Works
+```
+Server Structure:
+
+The server must make the files available directly over HTTP:
+
+http://example-server.com/
+
+├── index.zip
+├── package1.zip
+└── package2.zip
+
+The index.zip must be in the root of the repository.
+```
+
+## Index.zip structure:
+
+```
+
+The index.zip must have a index.json.
+
+index.zip
+└── index.json
+```
+
+## Index.json Structure
+
+```
+
+Example of a index:
+
+{
+  "repo": "repo-example",
+  "updated": "2026-03-14",
+  "packages": [
+    {
+      "name": "package1",
+      "version": "1.0.0",
+      "description": "package1 description",
+      "url": "http://example-server.com/package1.zip",
+      "system": "windows",
+      "hash": ""
+    },
+    {
+      "name": "package2",
+      "version": "1.0.0",
+      "description": "package2 description",
+      "url": "http://example-server.com/package2.zip",
+      "system": "windows",
+      "hash": ""
+    }
+  ]
+}
+```
+
+## Fields:
+
+| Fields   | Description            |
+| -------- | ---------------------- |
+| repo     | Name of the repository |
+| packages | List of Available      |
+| name     | Name of the package    |
+| url      | Url of the package     |
+
+## How Zap Works
 
 1. **Update** — Downloads `index.zip` from each repository and extracts the package list
-2. **Search** — Looks up the requested package name in the index and writes the URL to `Packages.tmp`
+2. **Search** — Looks up the requested package name in the index and return the url
 3. **Download** — Downloads the `.zip` file from the URL (multithreaded)
 4. **Install** — Moves the zip to the final folder, extracts it, and removes the zip
 
@@ -104,7 +167,6 @@ Repositories are defined in `zapp/repos.json`:
 - [x] Download
 - [x] List
 - [x] Remove
-- [ ] Search
 - [ ] Update
 - [ ] Update-all
 - [ ] Package metadata (info)

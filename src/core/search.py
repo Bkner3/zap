@@ -3,9 +3,6 @@ from src.zap_path import PathManager
 from src.utils.json_utils import read_json
 from os import path, listdir
 
-tmp_packages_file = PathManager.get("tmp_packages")
-tmp_path = PathManager.get("tmp")
-
 def search_repo_packages(packages):
     tmp_path = PathManager.get("tmp")
 

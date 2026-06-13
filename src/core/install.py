@@ -7,37 +7,44 @@ from src.utils.zip_utils import extract_zip
 from src.zap_path import PathManager
 from src.db.database import save_package
 from src.core.search import search_repo_packages
-from colorama import Fore, init
+from colorama import Fore, Style, init
 from platform import system
+from src.utils.write_logs import log_warning, log_info
 
 init(autoreset=True)
 
 def install(packages):
     if not packages:
+        log_warning("No packages specified.")
         print("No packages specified. Use: zap install <package>\n")
         return
-    result= only_download(packages)
+    
+    result = only_download(packages)
     successful_packages = result.get("downloaded", [])
     failed_packages = result.get("failed", [])
     missing_packages = result.get("missing", [])
 
     if not successful_packages:
+        log_warning("No packages were downloaded successfully.")
         print("No packages were downloaded successfully.")
         return
-    else:
-        index = search_repo_packages(successful_packages)
+    
+    log_info(f"Searching from {successful_packages} in the index list.")
+    index = search_repo_packages(successful_packages)
 
+    log_info("Download completed. Installing packages...")
     print("\nDownload completed. Installing packages...")
 
     ext_path = PathManager.get("ext")
     bin_path = PathManager.get("bin")
     symlinks_path = PathManager.get("sl")
-    index_file = PathManager.get("tmp_packages")
     
     for package in index["packages"]:
         package_name = package["name"]
         package_version = package["version"]
         package_desc = package["description"]
+
+        log_info("Package name: {package_name}, Package version {package_version}")
 
         filename = f"{package_name}.zip"
         file_path = path.join(ext_path, filename)
@@ -48,12 +55,14 @@ def install(packages):
         target_file = path.join(install_folder, filename)
 
         if not path.exists(install_folder):
+            log_info(f"Creating the instalation folder of {package_name} in {install_folder}")
             makedirs(install_folder, exist_ok=True)
 
+        log_info(f"Moving {file_path} to {install_folder}")
         move_files(file_path, install_folder)
 
         extract_zip(target_file, install_folder)
-
+        log_info(f"Deleting {target_file}")
         remove(target_file)
 
         if system() == "Windows":
@@ -71,12 +80,13 @@ def install(packages):
             package_desc
         )
         print(f"Saved {package_name} to database.")
+        log_info(f"Installed {package_name} successfully.")
         print(f"Installed {package_name} successfully.")
 
     print(f"\n{Fore.GREEN}Installation process completed.\n{Fore.RESET}Successfully installed: {Fore.GREEN}{', '.join(successful_packages)}")
     if missing_packages:
-        print(f"Packages not found: {Fore.RED}{', '.join(missing_packages)}")
+        print(f"Packages not found: {Style.BRIGHT}{Fore.LIGHTRED_EX}{', '.join(missing_packages)}")
     if failed_packages:
-        print(f"Failed to install: {Fore.LIGHTRED_EX} {', '.join(failed_packages)}")
+        print(f"Failed to install: {Style.BRIGHT}{Fore.LIGHTRED_EX} {', '.join(failed_packages)}")
     else:
         print(f"All packages installed successfully.\n")

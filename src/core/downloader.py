@@ -16,8 +16,7 @@ from src.utils.write_logs import *
 
 
 CHUNK_SIZE = 4096
-downloaded = []
-failed = []
+
 
 def get_context():
     log_info("Setting and returning the download context.")
@@ -126,6 +125,7 @@ def download_index(cfg):
         os.rename(index_file, final_path)
         log_info(f"Renaming {index_file} to {final_path}")
 
+
 def only_download(packages):
     cfg = get_context()
 
@@ -137,15 +137,19 @@ def only_download(packages):
 
     if not packages_to_download:
         print(Fore.YELLOW + "No packages found.")
+        log_warning("No packages found.")
         return {"downloaded": [], "failed": packages, "missing": missing}
 
     threads = []
     downloaded = []
     failed = []
     print(Style.BRIGHT + Fore.BLUE + "\nStarting package download\n")
+    log_info("Starting package download.")
+
     for package in packages_to_download:
         url = package["url"]
         name = package["name"]
+        log_info(f"Name: {name}, URL: {url}")
 
         extension = Path(url).suffix
         output_name = f"{name}{extension}"
@@ -160,7 +164,8 @@ def only_download(packages):
 
     for thread in threads:
         thread.join()
-
+    
+    log_info(f"Downloaded:{downloaded}, Failed: {failed}, Missing: {missing}")
     return {
         "downloaded": downloaded,
         "failed": failed,
@@ -185,12 +190,13 @@ def download_to(packages, destination):
     for file_name in new_files:
         source = os.path.join(ext_path, file_name)
         target = os.path.join(destination, file_name)
-
+        log_info(f"Moving: {source} to {target}")        
         move(source, target)
 
 
 def download_worker(url, output_name, cfg, downloaded, failed, name):
     result = download(url, output_name, "Package", cfg)
+
 
     if result and os.path.exists(result):
         downloaded.append(name)
