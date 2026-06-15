@@ -126,10 +126,12 @@ def download_index(cfg):
         log_info(f"Renaming {index_file} to {final_path}")
 
 
-def only_download(packages):
+def only_download(packages, process):
     cfg = get_context()
-
-    download_index(cfg)
+    if process == "update":
+        pass
+    else:
+        download_index(cfg)
 
     data = search_repo_packages(packages)
     packages_to_download = data.get("packages", [])
@@ -181,7 +183,7 @@ def download_to(packages, destination):
 
     before = set(os.listdir(ext_path))
 
-    only_download(packages)
+    only_download(packages, "package")
 
     after = set(os.listdir(ext_path))
 
@@ -193,9 +195,8 @@ def download_to(packages, destination):
         log_info(f"Moving: {source} to {target}")        
         move(source, target)
 
-
 def download_worker(url, output_name, cfg, downloaded, failed, name):
-    result = download(url, output_name, "Package", cfg)
+    result = download(url, output_name, "package", cfg)
 
 
     if result and os.path.exists(result):

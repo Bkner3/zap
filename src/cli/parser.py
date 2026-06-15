@@ -45,7 +45,7 @@ def start(current_dir, corversion):
     command, packages = read_args()
 
     commands = {
-        "install": lambda: install(packages),
+        "install": lambda: install(packages, "package"),
         "remove": lambda: remove(packages),
         "download": lambda: download_to(packages, current_dir),
         "add": lambda: add_repo(packages),

@@ -13,13 +13,13 @@ from src.utils.write_logs import log_warning, log_info
 
 init(autoreset=True)
 
-def install(packages):
+def install(packages, process):
     if not packages:
         log_warning("No packages specified.")
         print("No packages specified. Use: zap install <package>\n")
         return
     
-    result = only_download(packages)
+    result = only_download(packages, process)
     successful_packages = result.get("downloaded", [])
     failed_packages = result.get("failed", [])
     missing_packages = result.get("missing", [])

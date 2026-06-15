@@ -24,6 +24,7 @@ class PathManager:
             "installed_file": join(user_root, "data", "installed.json"),
             "config_file": join(user_root, "data", "config.json"),
             "log_file": join(user_root, "data", "zap.log"),
+            "repos_file": join(user_root, "data", "repos.json"),
 
             # ROOT (runtime)
             "root": root,
@@ -33,7 +34,6 @@ class PathManager:
             "tmp": join(root, "zapp", "tmp"),
 
             # Files (runtime)
-            "repos_file": join(root, "zapp", "repos.json"),
             "tmp_packages": join(root, "zapp", "tmp", "Packages_tmp.json")
         }
 

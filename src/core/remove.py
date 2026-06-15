@@ -3,6 +3,7 @@ from src.zap_path import PathManager
 from os import path
 from shutil import rmtree
 from src.db.database import init_db, delete_package
+from colorama import Fore
 
 from src.utils.launcher import remove_launcher 
 from src.utils.write_logs import log_info
@@ -32,4 +33,4 @@ def remove(packages):
         
         delete_package(package)
         log_info(f"Removed package: {package}")
-        print(f"Removed package: {package}")
+        print(f"Removed package: {Fore.MAGENTA + package}")
