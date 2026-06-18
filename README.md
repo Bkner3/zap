@@ -144,20 +144,27 @@ Example of a index:
 
 ## How Zap Works
 
-1. **Update** — Downloads `index.zip` from each repository and extracts the package list
-2. **Search** — Looks up the requested package name in the index and return the url
-3. **Download** — Downloads the `.zip` file from the URL (multithreaded)
-4. **Install** — Moves the zip to the final folder, extracts it, and removes the zip
+1. **Update** — Downloads `index.zip` from repositories and extracts package metadata
+2. **Search** — Finds the requested package in the repository index
+3. **Download** — Downloads the package archive (multithreaded)
+4. **Verify** — Checks the SHA-256 hash to validate file integrity
+5. **Install** — Extracts the package and creates launchers
 
----
+## Security
+
+ZAP uses SHA-256 file integrity verification.
+
+Before installing a package, ZAP compares the downloaded file hash with the hash provided by the repository index.
+
+If the hashes do not match, the package is rejected and removed.
 
 ## Supported Systems
 
-| OS      | Supported |
-| ------- | --------- |
-| Windows | YES       |
-| Linux   | YES       |
-| macOS   | NO        |
+| OS      | Supported               |
+| ------- | ----------------------- |
+| Windows | YES                     |
+| Linux   | Experimental / Untested |
+| macOS   | NO                      |
 
 ---
 

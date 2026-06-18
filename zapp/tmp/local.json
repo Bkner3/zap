@@ -1,0 +1,22 @@
+{
+  "repo": "local",
+  "updated": "2026-03-14",
+  "packages": [
+    {
+      "name": "rufus",
+      "version": "1.0.6",
+      "description": "Rufus package",
+      "url": "http://localhost:8000/packages/rufus.zip",
+      "system": "windows",
+      "hash": "4C2A8E15F0C14DB9DB32A163B7CE406109B6F1B853F465689CDCD8BEF7DC7D9A"
+    },
+    {
+      "name": "wget",
+      "version": "2.0.0",
+      "description": "Wget package",
+      "url": "http://localhost:8000/packages/wget.zip",
+      "system": "windows",
+      "hash": "75100BCCB8CB44ABA12A26C20C20FBE89C28DA53184A9FD783D76DD1DB617E04"
+    }
+  ]
+}

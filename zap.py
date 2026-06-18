@@ -33,6 +33,7 @@ This project is in early development, expect bugs and missing features.
 import os
 import sys
 import shutil
+from platform import system
 
 #ZAP STARTING PATH SYSTEM
 from src.zap_path import PathManager
@@ -67,4 +68,18 @@ if os.path.exists(tmp_path):
     os.makedirs(tmp_path)
 
 if __name__ == "__main__":
+    if system() == "Linux":
+
+        while True:
+            print("Zap\nThe Linux version can be unstable and not tested yet.")
+
+            opt = input("[y] - yes\n[n] - no\n> ").lower()
+
+            if opt == "y":
+                break
+            elif opt == "n":
+                exit()
+            else:
+                print("Wrong option")
+
     start(current_dir, corversion)
