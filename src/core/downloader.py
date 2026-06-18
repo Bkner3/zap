@@ -12,8 +12,8 @@ from src.zap_path import PathManager
 from src.utils.json_utils import read_json
 from src.utils.zip_utils import extract_zip
 from src.core.search import search_repo_packages
-from src.utils.write_logs import *
-
+from src.utils.write_logs import log_info, log_debug, log_error, log_warning
+import hashlib
 
 CHUNK_SIZE = 4096
 
@@ -149,8 +149,11 @@ def only_download(packages, process):
     log_info("Starting package download.")
 
     for package in packages_to_download:
+        
         url = package["url"]
         name = package["name"]
+        expected_hash = package["hash"]
+        
         log_info(f"Name: {name}, URL: {url}")
 
         extension = Path(url).suffix
@@ -158,7 +161,7 @@ def only_download(packages, process):
 
         thread = Thread(
             target=download_worker,
-            args=(url, output_name, cfg, downloaded, failed, name)
+            args=(url, output_name, cfg, downloaded, failed, name, expected_hash)
         )
 
         thread.start()
@@ -195,11 +198,20 @@ def download_to(packages, destination):
         log_info(f"Moving: {source} to {target}")        
         move(source, target)
 
-def download_worker(url, output_name, cfg, downloaded, failed, name):
+def download_worker(url, output_name, cfg, downloaded, failed, name, expected_hash):
     result = download(url, output_name, "package", cfg)
-
-
+    log_info(f"Checking the integrity of {result}")
     if result and os.path.exists(result):
-        downloaded.append(name)
+        with open(result, "rb") as f:
+            download_file_hash = hashlib.sha256(f.read()).hexdigest().upper()
+
+        if download_file_hash == expected_hash.upper():
+            log_info(f"The {name} hash matched.")
+            downloaded.append(name)
+        else:
+            log_error(f"SHA256 mismatch! Removing {result}")
+            print(f"{Fore.RED + Style.BRIGHT}SHA256 mismatch! Removing {result}")
+            failed.append(name)
+            os.remove(result)
     else:
         failed.append(name)
