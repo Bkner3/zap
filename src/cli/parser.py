@@ -8,7 +8,7 @@ from src.core.install import install
 from src.core.remove import remove
 from src.core.list import list_packages
 from src.db.database import reset_db
-from src.core.open_tools import open_tools
+from src.core.repo_tools import repo_tools
 from src.core.update import update
 from src.utils.write_logs import log_info, log_error
 
@@ -55,7 +55,7 @@ def start(current_dir, corversion):
         "update": lambda: update(),
         "reset-db": lambda:reset_db(),
         "version": lambda: """The show_on_start function already shows the version, so we don't need to do anything here. print("") just to avoid syntax error""",
-        "open-tools": lambda: open_tools()
+        "repo-tools": lambda: repo_tools()
     }
 
     if command not in commands:

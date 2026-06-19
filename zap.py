@@ -48,7 +48,7 @@ PathManager.setup(root)
 # If you do not initialize it, the program will crash and will not work properly.
 
 #ZAP ESSENCIAL IMPORTS 
-from src.utils.write_logs import log_info, log_warning, log_error, log_debug
+from src.utils.write_logs import log_info, log_debug
 from src.cli.parser import start
 
 #ZAP STARTING

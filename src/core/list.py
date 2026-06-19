@@ -11,5 +11,5 @@ def list_packages():
         print("Package list:")
         log_info("Package list:")
         log_info(packages)
-    for package in packages:
-        print(package)
+        for package in packages:
+            print(", ".join(package))

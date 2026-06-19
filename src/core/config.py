@@ -65,7 +65,6 @@ def read_config():
     default_config = {
         "show_logo": True,
         "type_logo": "original",
-        "is_on_tools": False,
         "is_on_debug": False
     }
 

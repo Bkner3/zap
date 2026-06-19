@@ -1,5 +1,9 @@
 import json
 
+def create_json(file, data):
+    with open(file, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+
 def save_json(key, value, file_path):
     with open(file_path, "r") as f:
         data = json.load(f)
