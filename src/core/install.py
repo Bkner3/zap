@@ -23,6 +23,7 @@ def install(packages, process):
     successful_packages = result.get("downloaded", [])
     failed_packages = result.get("failed", [])
     missing_packages = result.get("missing", [])
+    not_supported = result.get("os_notsupported", [])
 
     if not successful_packages:
         log_warning("No packages were downloaded successfully.")
@@ -84,6 +85,8 @@ def install(packages, process):
         print(f"Installed {package_name} successfully.")
 
     print(f"\n{Fore.GREEN}Installation process completed.\n{Fore.RESET}Successfully installed: {Fore.GREEN}{', '.join(successful_packages)}")
+    if not_supported:
+        print(f"Packages not supported for your os: {Style.BRIGHT}{Fore.LIGHTRED_EX}{', '.join(not_supported)} ")
     if missing_packages:
         print(f"Packages not found: {Style.BRIGHT}{Fore.LIGHTRED_EX}{', '.join(missing_packages)}")
     if failed_packages:

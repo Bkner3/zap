@@ -136,8 +136,10 @@ def only_download(packages, process):
     data = search_repo_packages(packages)
     packages_to_download = data.get("packages", [])
     missing = data.get("missing", [])
+    notsupported = data.get("os_notsupported", [])
 
     if not packages_to_download:
+ 
         print(Fore.YELLOW + "No packages found.")
         log_warning("No packages found.")
         return {"downloaded": [], "failed": packages, "missing": missing}
@@ -174,7 +176,8 @@ def only_download(packages, process):
     return {
         "downloaded": downloaded,
         "failed": failed,
-        "missing": missing
+        "missing": missing,
+        "os_notsupported": notsupported 
     }
 
 

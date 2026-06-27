@@ -1,11 +1,16 @@
 from os import path, listdir
+from platform import system
+
 from src.zap_path import PathManager
 from src.utils.json_utils import read_json
-from os import path, listdir
+
 
 def search_repo_packages(packages):
     tmp_path = PathManager.get("tmp")
 
+    current_os = system()
+
+    os_notsupported = []
     all_found_packages = []
     found = set()
 
@@ -15,10 +20,18 @@ def search_repo_packages(packages):
 
             for pkg in data.get("packages", []):
                 if pkg["name"] in packages:
-                    pkg["repo"] = data.get("repo", "unknown")
-                    all_found_packages.append(pkg)
-                    found.add(pkg["name"])
+                    if pkg["system"] == current_os:
+                        pkg["repo"] = data.get("repo", "unknown")
+                        all_found_packages.append(pkg)
+                        found.add(pkg["name"])
+                    else:
+                        os_notsupported.append(pkg["name"])
 
-    missing = set(packages) - found
+    missingwf = set(packages) - found
+    missing = missingwf - set(os_notsupported)
 
-    return {"packages": all_found_packages, "missing": list(missing)}
+    return {
+        "packages": all_found_packages,
+        "missing": list(missing),
+        "os_notsupported": os_notsupported
+    }
