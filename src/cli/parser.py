@@ -9,7 +9,7 @@ from src.core.remove import remove
 from src.core.list import list_packages
 from src.db.database import reset_db
 from src.core.repo_tools import repo_tools
-from src.core.update import update
+from src.core.update import update, upgrade
 from src.utils.write_logs import log_info, log_error
 
 from src.cli.ui import show_on_start, show_help
@@ -53,6 +53,7 @@ def start(current_dir, corversion):
         "help": show_help,
         "config": lambda: config_zap(packages[0]),
         "update": lambda: update(),
+        "upgrade": lambda: upgrade(corversion),
         "reset-db": lambda:reset_db(),
         "version": lambda: """The show_on_start function already shows the version, so we don't need to do anything here. print("") just to avoid syntax error""",
         "repo-tools": lambda: repo_tools()

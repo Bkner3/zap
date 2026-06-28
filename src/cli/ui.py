@@ -29,7 +29,7 @@ def show_help():
             {Fore.GREEN}remove{Fore.RESET}        Remove a package
             {Fore.GREEN}download{Fore.RESET}      Download a package without installing
             {Fore.GREEN}update{Fore.RESET}        Update a specific package
-            {Fore.GREEN}update-all{Fore.RESET}    Update all installed packages
+            {Fore.GREEN}upgrade{Fore.RESET}       Update zap to the last version
             {Fore.GREEN}add{Fore.RESET}           Add a new repository
             {Fore.GREEN}search{Fore.RESET}        Search for packages in the repository
             {Fore.GREEN}list{Fore.RESET}          List all installed packages

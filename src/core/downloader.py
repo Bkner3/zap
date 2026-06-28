@@ -3,6 +3,7 @@ from shutil import move
 from pathlib import Path
 
 import os
+import sys
 import requests
 
 from tqdm import tqdm
@@ -31,19 +32,20 @@ def get_context():
 
 def download(url, output_name, file_type, cfg):
     base_dir = cfg["download"] if file_type == "Index" else cfg["ext"]
-
     output_path = os.path.join(base_dir, output_name)
-    log_info(f"Output Directory: {output_path}")
+    headers = {"User-Agent": "ZAP-PackageManager"}
+    
     try:
-        with requests.get(url, stream=True) as response:
+        with requests.get(url, stream=True, headers=headers) as response:
             if response.status_code != 200:
                 if file_type != "Index":
                     log_error(f"Failed to download: {url}")
                     print(Fore.RED + f"Failed to download: {url}")
                 return None
-            
 
+            log_info(f"Output Directory: {output_path}")
             total = int(response.headers.get("content-length", 0))
+            
             with open(output_path, "wb") as file, tqdm(
                 total=total if total > 0 else None,
                 unit="B",
@@ -52,21 +54,27 @@ def download(url, output_name, file_type, cfg):
                 ncols=100,
                 ascii=" ━",
                 colour="white",
+                file=sys.stderr,
                 bar_format="{desc} {percentage:3.0f}% |{bar}| {n_fmt}/{total_fmt} @ {rate_fmt}",
             ) as progress:
 
                 for chunk in response.iter_content(CHUNK_SIZE):
                     if not chunk:
                         continue
-
                     file.write(chunk)
                     progress.update(len(chunk))
+
+            content_type = response.headers.get("Content-Type", "")
+            if "application/json" in content_type:
+                log_info(f"Processing downloaded file as API/JSON: {output_path}")
+                return read_json(output_path)
+                    
+        log_info(f"This url ({url}) was downloaded")
+        return output_path
+
     except requests.RequestException:
-        print(f"Error download: {url}")
         print(Fore.RED + f"Error downloading: {url}")
         return None
-    log_info(f"This url ({url}) was download")
-    return output_path
 
 
 def download_index(cfg):

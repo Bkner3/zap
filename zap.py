@@ -52,7 +52,7 @@ from src.utils.write_logs import log_info, log_debug
 from src.cli.parser import start
 
 #ZAP STARTING
-corversion = "0.5.0-beta"
+corversion = "v0.5.0-beta"
 current_dir = os.getcwd()
 tmp_path = PathManager.get("tmp")
 
