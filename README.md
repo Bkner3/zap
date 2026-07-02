@@ -179,3 +179,5 @@ If the hashes do not match, the package is rejected and removed.
 - [ ] Package metadata (info)
 - [ ] Dependency resolution
 - [ ] Install scripts
+
+### Thanks for Reading
