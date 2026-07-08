@@ -54,7 +54,6 @@ def download(url, output_name, file_type, cfg):
                 ncols=100,
                 ascii=" ━",
                 colour="white",
-                file=sys.stderr,
                 bar_format="{desc} {percentage:3.0f}% |{bar}| {n_fmt}/{total_fmt} @ {rate_fmt}",
             ) as progress:
 
@@ -159,8 +158,8 @@ def only_download(packages, process):
     log_info("Starting package download.")
 
     for package in packages_to_download:
-        
         url = package["url"]
+
         name = package["name"]
         expected_hash = package["hash"]
         
@@ -208,6 +207,7 @@ def download_to(packages, destination):
         target = os.path.join(destination, file_name)
         log_info(f"Moving: {source} to {target}")        
         move(source, target)
+
 
 def download_worker(url, output_name, cfg, downloaded, failed, name, expected_hash):
     result = download(url, output_name, "package", cfg)

@@ -44,7 +44,7 @@ zap <command> [package]
 | `install`  | Install a package                         | Implemented         |
 | `remove`   | Remove a package                          | Implemented         |
 | `download` | Download a package without installing     | Implemented         |
-| `update`   | Update a specific package                 | Not implemented yet |
+| `update`   | Update a specific package                 | Implemented         |
 | `list`     | List all installed packages               | Implemented         |
 | `info`     | Show detailed information about a package | Not implemented yet |
 | `help`     | Show this help message                    | Implemented         |
@@ -93,7 +93,7 @@ http://example-server.com/
 The index.zip must be in the root of the repository.
 ```
 
-## Index.zip structure:
+## index.zip structure:
 
 ```
 
@@ -111,13 +111,14 @@ Example of a index:
 
 {
   "repo": "repo-example",
+  "base_url": "http://example-server.com/",
   "updated": "2026-03-14",
   "packages": [
     {
       "name": "package1",
       "version": "1.0.0",
       "description": "package1 description",
-      "url": "http://example-server.com/package1.zip",
+      "url": "package1.zip",
       "system": "windows",
       "hash": ""
     },
@@ -125,7 +126,7 @@ Example of a index:
       "name": "package2",
       "version": "1.0.0",
       "description": "package2 description",
-      "url": "http://example-server.com/package2.zip",
+      "url": "package2.zip",
       "system": "windows",
       "hash": ""
     }
@@ -138,7 +139,7 @@ Example of a index:
 | Fields   | Description            |
 | -------- | ---------------------- |
 | repo     | Name of the repository |
-| packages | List of Available      |
+| packages | List of available packages |
 | name     | Name of the package    |
 | url      | Url of the package     |
 
@@ -181,3 +182,8 @@ If the hashes do not match, the package is rejected and removed.
 - [ ] Install scripts
 
 ### Thanks for Reading
+---
+```
+Copyright (c) 2026 Bernardo
+Licensed under the MIT License.
+```

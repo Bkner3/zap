@@ -1,5 +1,5 @@
 import argparse
-from sys import argv
+from sys import argv, exit as sys_exit
 
 from src.core.add_repo import add_repo
 from src.core.downloader import download_to
@@ -20,7 +20,7 @@ def read_args():
     if len(argv) < 2:
         print("Use: zap <command> <package>")
         log_error("No command provided.")
-        exit()
+        sys_exit(1)
 
     parser = argparse.ArgumentParser(description="Zap package manager")
 

@@ -13,7 +13,7 @@ compile_pyinstaller:
 	@$(PYTHON) -m pip install pyinstaller
 	@echo "Compiling with PyInstaller..."
 	@$(PYTHON) -m pip install -r $(REQ_FILE)
-	@$(PYTHON) -m PyInstaller --onefile --noconsole $(APP)
+	@$(PYTHON) -m PyInstaller --onefile $(APP)
 
 pyinstaller_clean:
 	@echo "Cleaning PyInstaller build files..."

@@ -17,15 +17,18 @@ def search_repo_packages(packages):
     for file in listdir(tmp_path):
         if file.endswith(".json"):
             data = read_json(path.join(tmp_path, file))
+            base_url = data.get("base_url")
 
             for pkg in data.get("packages", []):
                 if pkg["name"] in packages:
                     if pkg["system"] == current_os:
                         pkg["repo"] = data.get("repo", "unknown")
+                        pkg["url"] = base_url + pkg["url"]
                         all_found_packages.append(pkg)
                         found.add(pkg["name"])
                     else:
                         os_notsupported.append(pkg["name"])
+                
 
     missingwf = set(packages) - found
     missing = missingwf - set(os_notsupported)
