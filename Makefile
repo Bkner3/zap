@@ -1,6 +1,7 @@
 APP = zap.py
 PYTHON = python
 REQ_FILE = requirements.txt
+ICON = $(CURDIR)/assets/zap_icon.ico
 
 all: welcome compile_pyinstaller pyinstaller_clean
 
@@ -11,9 +12,8 @@ welcome:
 compile_pyinstaller:
 	@$(PYTHON) -m pip install --upgrade pip
 	@$(PYTHON) -m pip install pyinstaller
-	@echo "Compiling with PyInstaller..."
 	@$(PYTHON) -m pip install -r $(REQ_FILE)
-	@$(PYTHON) -m PyInstaller --onefile $(APP)
+	@$(PYTHON) -m PyInstaller --onefile --icon=$(ICON) $(APP)
 
 pyinstaller_clean:
 	@echo "Cleaning PyInstaller build files..."

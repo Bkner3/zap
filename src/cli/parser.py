@@ -67,3 +67,4 @@ def start(current_dir, corversion):
     show_on_start(corversion)
     log_info(f"Executing {command} with packages or args: {packages}")
     commands[command]()
+    sys_exit(0)

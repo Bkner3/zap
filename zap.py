@@ -3,7 +3,7 @@
 
 """
 Zippy Asset Packager - A simple package manager
-#Version: 0.5.0-beta
+#Version: 0.6.0-beta
 Github: https://github.com/Bkner3/zap
 This project is in early development, expect bugs and missing features.
 """
@@ -31,7 +31,7 @@ from src.utils.write_logs import log_info, log_debug
 from src.cli.parser import start
 
 #ZAP STARTING
-corversion = "v0.5.0-beta"
+corversion = "v0.6.0-beta"
 current_dir = os.getcwd()
 tmp_path = PathManager.get("tmp")
 
