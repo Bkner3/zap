@@ -23,3 +23,23 @@
 
   scheduleFlicker();
 })();
+
+
+// Copy install command
+function copyCommand() {
+  const command = document.getElementById("install-command");
+
+  if (!command) return;
+
+  navigator.clipboard.writeText(command.innerText.trim());
+
+  const button = document.querySelector(".command-header button");
+
+  if (!button) return;
+
+  button.innerText = "Copied!";
+
+  setTimeout(() => {
+    button.innerText = "Copy";
+  }, 2000);
+}

@@ -6,11 +6,11 @@
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
-  <title>Zap PM </title>
+  <title>ZAP PM</title>
 </head>
 <body>
   <div class="scanline"></div>
-  <div class="corner-tag">v0.1.0</div>
+  <div class="corner-tag">v0.6.0-beta</div>
 
   <!-- HERO -->
   <section class="hero">
@@ -61,19 +61,44 @@
       </div>
     </div>
   </section>
+  <div class="divider"></div>
+
+<!-- How to install -->
+
+<section class="section">
+  <h2 class="section-title">
+    <span class="title-accent">01</span> How to install
+  </h2>
+
+  <p class="install-instructions">
+    Run the following command in your terminal:
+  </p>
+
+  <div class="command-box">
+    <div class="command-header">
+      <span>Windows Powershell</span>
+      <button onclick="copyCommand()">Copy</button>
+    </div>
+
+    <div class="command-content">
+      <code id="install-command">
+        irm https://raw.githubusercontent.com/Bkner3/zap/refs/heads/main/setup/install.ps1 | iex
+      </code>
+    </div>
+  </div>
 
   <div class="divider"></div>
+</section>
 
   <!-- COMMANDS -->
   <section class="section">
-    <h2 class="section-title"><span class="title-accent">01</span> commands</h2>
+    <h2 class="section-title"><span class="title-accent">02</span> commands</h2>
     <div class="commands-grid">
       <div class="cmd-row"><code>zap install &lt;pkg&gt;</code><span>install a package</span></div>
+      <div class="cmd-row"><code>zap update &lt;pkg&gt;</code><span>update all packages</span></div>
       <div class="cmd-row"><code>zap remove &lt;pkg&gt;</code><span>remove a package</span></div>
       <div class="cmd-row"><code>zap download &lt;pkg&gt;</code><span>download without installing</span></div>
-      <div class="cmd-row"><code>zap update &lt;pkg&gt;</code><span>update a specific package</span></div>
-      <div class="cmd-row"><code>zap update-all</code><span>update all installed packages</span></div>
-      <div class="cmd-row"><code>zap search &lt;pkg&gt;</code><span>search the repository</span></div>
+      <div class="cmd-row"><code>zap upgrade</code><span>upgrade zap</span></div>
       <div class="cmd-row"><code>zap add &lt;repo&gt;</code><span>add a new repository</span></div>
       <div class="cmd-row"><code>zap list</code><span>list all installed packages</span></div>
       <div class="cmd-row"><code>zap info &lt;pkg&gt;</code><span>show package details</span></div>
@@ -86,7 +111,7 @@
 
   <!-- HOW IT WORKS -->
   <section class="section">
-    <h2 class="section-title"><span class="title-accent">02</span> how it works</h2>
+    <h2 class="section-title"><span class="title-accent">03</span> how it works</h2>
     <div class="steps">
       <div class="step">
         <span class="step-num">1</span>
@@ -99,7 +124,7 @@
         <span class="step-num">2</span>
         <div>
           <p class="step-label">search</p>
-          <p class="step-desc">Looks up the package name in the index and writes the URL to <code>Packages.tmp</code>.</p>
+          <p class="step-desc">Looks up the package name in the index and saves all package information.</p>
         </div>
       </div>
       <div class="step">
@@ -113,7 +138,7 @@
         <span class="step-num">4</span>
         <div>
           <p class="step-label">install</p>
-          <p class="step-desc">Moves the zip to the final folder, extracts it, and removes the archive.</p>
+          <p class="step-desc">Moves the zip to the final folder, extracts it, adds to the package database, and removes the archive.</p>
         </div>
       </div>
     </div>
@@ -124,35 +149,34 @@
   <!-- PLATFORMS + ROADMAP -->
   <section class="section two-col">
     <div>
-      <h2 class="section-title"><span class="title-accent">03</span> platforms</h2>
+      <h2 class="section-title"><span class="title-accent">04</span> platforms</h2>
       <div class="platform-list">
         <div class="platform-row">
+          <svg class="os-icon" viewBox="0 0 24 24" fill="#5a5a52" width="16" height="16"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
           <span class="os">Windows</span>
           <span class="tag tag-yes">supported</span>
-          <span class="ver">v0.01</span>
         </div>
         <div class="platform-row">
+          <img class="os-icon" src="https://cdn.simpleicons.org/linux/5a5a52" width="16" height="16" alt="Linux">
           <span class="os">Linux</span>
-          <span class="tag tag-yes">supported</span>
-          <span class="ver">v0.01</span>
+          <span class="tag tag-wip">coming soon</span>
         </div>
         <div class="platform-row">
+          <img class="os-icon" src="https://cdn.simpleicons.org/apple/5a5a52" width="16" height="16" alt="macOS">
           <span class="os">macOS</span>
-          <span class="tag tag-wip">coming soon</span>
-          <span class="ver">—</span>
+          <span class="tag tag-no">unavailable</span>
         </div>
       </div>
     </div>
 
     <div>
-      <h2 class="section-title"><span class="title-accent">04</span> roadmap</h2>
+      <h2 class="section-title"><span class="title-accent">05</span> roadmap</h2>
       <ul class="roadmap">
         <li class="done">install</li>
         <li class="done">download</li>
         <li class="done">list</li>
         <li class="done">remove</li>
-        <li>search</li>
-        <li>update / update-all</li>
+        <li class="done">update</li>
         <li>package metadata (info)</li>
         <li>dependency resolution</li>
         <li>install scripts</li>
@@ -163,7 +187,9 @@
   <div class="divider"></div>
 
   <footer>
-    created by <a href="https://github.com/Bkner3/" target="_blank">Bernardo</a>
+  <p>Created by <a href="https://github.com/Bkner3/" target="_blank">Bernardo</a></p>
+  <p>Inspired by <a href="https://brew.sh">homebrew</a>, <a href="https://wiki.debian.org/Apt">apt</a> and <a href="https://wiki.archlinux.org/title/Pacman">pacman</a></p>
+  <p>Make sure to check out the <a href="https://github.com/Bkner3/zap" target="_blank">github</a> repository!</p>
   </footer>
 
   <script src="main.js"></script>
