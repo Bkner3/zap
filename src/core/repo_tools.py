@@ -21,6 +21,7 @@ def create_index():
     print(Fore.BLUE + Style.BRIGHT + "\nCreate a repository:" + Style.RESET_ALL)
 
     repo_name = input("Write the repository name: ").strip()
+    repo_url = input("Write the repository BASE URL: ").strip()
     index_file = os.path.join(root, f"{repo_name}.json")
 
     today = date.today().isoformat()
@@ -28,6 +29,7 @@ def create_index():
     index_data = {
         "repo": repo_name,
         "updated": today,
+        "base_url": repo_url,
         "packages": []
     }
 
@@ -143,7 +145,7 @@ def repo_tools():
             found = False
             index_file = None
         elif opt == "1":
-            add_package()
+            add_package(index_file)
         elif opt == "2":
             edit_package()
         elif opt == "3":

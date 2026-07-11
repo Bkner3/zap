@@ -1,7 +1,7 @@
 import argparse
 from sys import argv, exit as sys_exit
 
-from src.core.add_repo import add_repo
+from src.core.s_repo import add_repo, remove_repo
 from src.core.downloader import download_to
 from src.core.config import config_zap
 from src.core.install import install
@@ -14,6 +14,7 @@ from src.utils.write_logs import log_info, log_error
 
 from src.cli.ui import show_on_start, show_help
 
+repo_tools_disabled = True  # Set to True to disable repo_tools command
 
 def read_args():
     log_info("Reading command line arguments.")
@@ -48,7 +49,8 @@ def start(current_dir, corversion):
         "install": lambda: install(packages, "package"),
         "remove": lambda: remove(packages),
         "download": lambda: download_to(packages, current_dir),
-        "add": lambda: add_repo(packages),
+        "repo-add": lambda: add_repo(packages),
+        "repo-remove": lambda: remove_repo(packages),
         "list": list_packages,
         "help": show_help,
         "config": lambda: config_zap(packages[0]),
@@ -56,7 +58,7 @@ def start(current_dir, corversion):
         "upgrade": lambda: upgrade(corversion),
         "reset-db": lambda:reset_db(),
         "version": lambda: """The show_on_start function already shows the version, so we don't need to do anything here. print("") just to avoid syntax error""",
-        "repo-tools": lambda: repo_tools()
+        "repo-tools": lambda: print("Repo Tools are currently unavailable. To test them, open the ZAP source code, go to `src/cli/parser.py` (line 17), and set `repo_tools_disabled` to `False`."if repo_tools_disabled else repo_tools()),
     }
 
     if command not in commands:

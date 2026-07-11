@@ -39,8 +39,7 @@ Invoke-WebRequest `
 
 
 $Shim = @"
-@echo off
-"$ExePath" %*
+@"$ExePath" %*
 "@
 
 Set-Content `

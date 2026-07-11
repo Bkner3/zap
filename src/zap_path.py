@@ -28,13 +28,13 @@ class PathManager:
 
             # ROOT (runtime)
             "root": root,
-            "core": join(root, "zapp", "core"),
-            "ext": join(root, "zapp", "ext"),
-            "download": join(root, "zapp", "down"),
-            "tmp": join(root, "zapp", "tmp"),
+            "core": join(user_root, "runtime", "core"),
+            "ext": join(user_root, "runtime", "ext"),
+            "download": join(user_root, "runtime", "down"),
+            "tmp": join(user_root, "runtime", "tmp"),
 
             # Files (runtime)
-            "tmp_packages": join(root, "zapp", "tmp", "Packages_tmp.json")
+            "tmp_packages": join(user_root, "runtime", "tmp", "Packages_tmp.json")
         }
 
         # Creates folders automatically (directories only, not files)

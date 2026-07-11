@@ -3,7 +3,7 @@ from shutil import move
 from pathlib import Path
 
 import os
-import sys
+from sys import exit as sys_exit
 import requests
 
 from tqdm import tqdm
@@ -86,7 +86,8 @@ def download_index(cfg):
     if not repos:
         log_warning("No repositories configured.")
         print(Fore.YELLOW + "No repositories configured.")
-        return
+        print(Fore.YELLOW + "Please add a repository using the 'zap repo-add <repo_url>' command.")
+        sys_exit(0)
 
     for repo_url in repos:
         repo_name = (
