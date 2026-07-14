@@ -14,7 +14,7 @@ from src.utils.json_utils import read_json
 from src.utils.zip_utils import extract_zip
 from src.core.search import search_repo_packages
 from src.utils.write_logs import log_info, log_debug, log_error, log_warning
-import hashlib
+from src.utils.hash import calculate_hash
 
 CHUNK_SIZE = 4096
 
@@ -214,8 +214,7 @@ def download_worker(url, output_name, cfg, downloaded, failed, name, expected_ha
     result = download(url, output_name, "package", cfg)
     log_info(f"Checking the integrity of {result}")
     if result and os.path.exists(result):
-        with open(result, "rb") as f:
-            download_file_hash = hashlib.sha256(f.read()).hexdigest().upper()
+        download_file_hash = calculate_hash(result)
 
         if download_file_hash == expected_hash.upper():
             log_info(f"The {name} hash matched.")
