@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOCS</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css">
+    <style>
+        body { box-sizing: border-box; min-width: 200px; max-width: 980px; margin: 0 auto; padding: 45px; }
+        @media (max-width: 767px) { body { padding: 15px; } }
+    </style>
+</head>
+<body class="markdown-body">
+
+    <div id="content">Loading content...</div>
+
+    <script>
+        async function loadMarkdown() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                let targetFile = urlParams.get('file');
+
+                if (!targetFile) {
+                    targetFile = 'README.md'; 
+                }
+                const response = await fetch(targetFile); 
+                
+                if (!response.ok) {
+                    throw new Error(`Could not load the file: ${targetFile}`);
+                }
+                
+                const markdownText = await response.text();
+                document.getElementById('content').innerHTML = marked.parse(markdownText);
+            } catch (error) {
+                document.getElementById('content').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        loadMarkdown();
+    </script>
+</body>
+</html>
