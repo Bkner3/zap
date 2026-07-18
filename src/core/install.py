@@ -13,7 +13,7 @@ from src.utils.write_logs import log_warning, log_info
 
 init(autoreset=True)
 
-def install(packages, process):
+def install(packages, process="package"):
     if not packages:
         log_warning("No packages specified.")
         print("No packages specified. Use: zap install <package>\n")
@@ -44,6 +44,7 @@ def install(packages, process):
         package_name = package["name"]
         package_version = package["version"]
         package_desc = package["description"]
+        package_exec = package["exec_file"]
 
         log_info("Package name: {package_name}, Package version {package_version}")
 
@@ -66,10 +67,7 @@ def install(packages, process):
         log_info(f"Deleting {target_file}")
         remove(target_file)
 
-        if system() == "Windows":
-            executable_path = path.join(install_folder, f"{package_name}.exe")
-        else:
-            executable_path = path.join(install_folder, package_name)
+        executable_path = path.join(install_folder, package_exec)
 
         create_launcher(package_name, executable_path, symlinks_path)
 

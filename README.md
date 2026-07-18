@@ -175,8 +175,8 @@ If the hashes do not match, the package is rejected and removed.
 - [x] Download
 - [x] List
 - [x] Remove
-- [ ] Update
-- [ ] Update-all
+- [x] Update
+- [x] Upgrade
 - [ ] Package metadata (info)
 - [ ] Dependency resolution
 - [ ] Install scripts

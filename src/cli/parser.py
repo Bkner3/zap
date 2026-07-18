@@ -11,6 +11,7 @@ from src.db.database import reset_db
 from src.repo_tools.repo_tools import repo_tools
 from src.core.update import update, upgrade
 from src.utils.write_logs import log_info, log_error
+from src.core.info import info
 
 from src.cli.ui import show_on_start, show_help
 
@@ -46,19 +47,20 @@ def start(current_dir, corversion):
     command, packages = read_args()
 
     commands = {
-        "install": lambda: install(packages, "package"),
+        "install": lambda: install(packages),
         "remove": lambda: remove(packages),
         "download": lambda: download_to(packages, current_dir),
         "repo-add": lambda: add_repo(packages),
         "repo-remove": lambda: remove_repo(packages),
         "list": list_packages,
         "help": show_help,
-        "config": lambda: config_zap(packages[0]),
+        "info": lambda: info(packages),
+        "config": lambda: config_zap(packages[0]) if packages else print("Error: No package provided for config."),
         "update": lambda: update(),
         "upgrade": lambda: upgrade(corversion),
-        "reset-db": lambda:reset_db(),
-        "version": lambda: """The show_on_start function already shows the version, so we don't need to do anything here. print("") just to avoid syntax error""",
-        "repo-tools": lambda: print("Repo Tools are currently unavailable. To test them, open the ZAP source code, go to `src/cli/parser.py` (line 17), and set `repo_tools_disabled` to `False`."if repo_tools_disabled else repo_tools()),
+        "reset-db": lambda: reset_db(),
+        "version": lambda: print(""),
+        "repo-tools": lambda: print("Repo Tools are currently unavailable. To test them, open the ZAP source code, go to `src/cli/parser.py` (line 17), and set `repo_tools_disabled` to `False`.") if repo_tools_disabled else repo_tools(),
     }
 
     if command not in commands:

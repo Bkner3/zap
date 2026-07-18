@@ -134,7 +134,7 @@ def download_index(cfg):
         log_info(f"Renaming {index_file} to {final_path}")
 
 
-def only_download(packages, process):
+def only_download(packages, process="package"):
     cfg = get_context()
     if process == "update":
         pass
