@@ -15,8 +15,6 @@ from src.core.info import info
 
 from src.cli.ui import show_on_start, show_help
 
-repo_tools_disabled = False # Set to True to disable repo_tools command
-
 def read_args():
     log_info("Reading command line arguments.")
     if len(argv) < 2:
@@ -60,7 +58,7 @@ def start(current_dir, corversion):
         "upgrade": lambda: upgrade(corversion),
         "reset-db": lambda: reset_db(),
         "version": lambda: print(""),
-        "repo-tools": lambda: print("Repo Tools are currently unavailable. To test them, open the ZAP source code, go to `src/cli/parser.py` (line 17), and set `repo_tools_disabled` to `False`.") if repo_tools_disabled else repo_tools(),
+        "repo-tools": lambda: print("Repo Tools are currently unavailable."),
     }
 
     if command not in commands:
