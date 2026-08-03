@@ -80,7 +80,7 @@ pip install -r requirements.txt
 ```
 
 > **Warning**
-> If you don't use the installation script, you need to add zap.bat along with all files and the sl directory inside the ZAP user data directory.
+> If you don't use the installation script, you need to add zap.bat along with all files and the sl directory inside the ZAP user data directory to the system path.
 
 
 ---
