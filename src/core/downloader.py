@@ -14,7 +14,7 @@ from src.utils.json_utils import read_json
 from src.utils.zip_utils import extract_zip
 from src.core.search import search_repo_packages
 from src.utils.write_logs import log_info, log_debug, log_error, log_warning
-import hashlib
+from src.utils.hash import calculate_hash
 
 CHUNK_SIZE = 4096
 
@@ -90,10 +90,12 @@ def download_index(cfg):
         sys_exit(0)
 
     for repo_url in repos:
-        repo_name = (
+        repo_filename = (
             repo_url.replace("http://", "")
             .replace("https://", "")
+            .replace(":", "_")
             .rstrip("/")
+            .replace("/", "_")
         )
 
         index_url = f"{repo_url.rstrip('/')}/index.zip"
@@ -102,19 +104,17 @@ def download_index(cfg):
 
         zip_path = download(
             index_url,
-            f"{repo_name}.zip",
+            f"{repo_filename}.zip",
             "Index",
             cfg
         )
-        log_debug(f"Index zip path: {zip_path}")
 
         if not zip_path:
-            log_warning("Skipping repository: {repo_url}")
+            log_warning(f"Skipping repository: {repo_url}")
             print(Fore.YELLOW + f"Skipping repository: {repo_url}")
             continue
 
         extract_zip(zip_path, tmp_path)
-        log_info(f"Removing: {zip_path}")
         os.remove(zip_path)
 
         index_file = os.path.join(tmp_path, "index.json")
@@ -122,19 +122,16 @@ def download_index(cfg):
         if not os.path.exists(index_file):
             continue
 
-        data = read_json(index_file)
-        log_info(f"Reading a repo name")
-        final_name = f"{data.get('repo', 'unknown')}.json"
-        final_path = os.path.join(tmp_path, final_name)
+        final_path = os.path.join(tmp_path, f"{repo_filename}.json")
 
         if os.path.exists(final_path):
             os.remove(final_path)
 
         os.rename(index_file, final_path)
-        log_info(f"Renaming {index_file} to {final_path}")
+        log_info(f"Renamed {index_file} to {final_path}")
 
 
-def only_download(packages, process):
+def only_download(packages, process="package"):
     cfg = get_context()
     if process == "update":
         pass
@@ -214,8 +211,7 @@ def download_worker(url, output_name, cfg, downloaded, failed, name, expected_ha
     result = download(url, output_name, "package", cfg)
     log_info(f"Checking the integrity of {result}")
     if result and os.path.exists(result):
-        with open(result, "rb") as f:
-            download_file_hash = hashlib.sha256(f.read()).hexdigest().upper()
+        download_file_hash = calculate_hash(result)
 
         if download_file_hash == expected_hash.upper():
             log_info(f"The {name} hash matched.")

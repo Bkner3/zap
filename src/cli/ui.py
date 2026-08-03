@@ -30,10 +30,11 @@ def show_help():
             {Fore.GREEN}download{Fore.RESET}      Download a package without installing
             {Fore.GREEN}update{Fore.RESET}        Update a specific package
             {Fore.GREEN}upgrade{Fore.RESET}       Update zap to the last version
-            {Fore.GREEN}add{Fore.RESET}           Add a new repository
+            {Fore.GREEN}repo-add{Fore.RESET}      Add a new repository
+            {Fore.GREEN}repo-remove{Fore.RESET}   Remove a repository
             {Fore.GREEN}search{Fore.RESET}        Search for packages in the repository
             {Fore.GREEN}list{Fore.RESET}          List all installed packages
             {Fore.GREEN}info{Fore.RESET}          Show detailed information about a package
             {Fore.GREEN}help{Fore.RESET}          Show this help message
-            {Fore.GREEN}config{Fore.RESET}        Configure zap settings"""
+            {Fore.GREEN}config{Fore.RESET}        Configure zap settings (Is only for stetic purposes, it does not change anything in the program)"""
     print(help_info)
