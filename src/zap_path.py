@@ -28,7 +28,6 @@ class PathManager:
 
             # ROOT (runtime)
             "root": root,
-            "core": join(user_root, "runtime", "core"),
             "ext": join(user_root, "runtime", "ext"),
             "download": join(user_root, "runtime", "down"),
             "tmp": join(user_root, "runtime", "tmp"),

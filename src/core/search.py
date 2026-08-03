@@ -4,10 +4,10 @@ from platform import system
 from src.zap_path import PathManager
 from src.utils.json_utils import read_json
 
+tmp_path = PathManager.get("tmp")
+current_os = system()
 
 def search_repo_packages(packages):
-    tmp_path = PathManager.get("tmp")
-    current_os = system()
 
     os_notsupported = []
     all_found_packages = []
