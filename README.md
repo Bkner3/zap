@@ -56,7 +56,7 @@ Required Python packages:
 Install them with:
 
 ```bash
-pip install -r requirements.txt
+pip install requests tqdm colorama
 ```
 
 ---
