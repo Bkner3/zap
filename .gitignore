@@ -30,3 +30,6 @@ dist/
 # Operating System files
 .DS_Store
 Thumbs.db
+
+#Functions in developement or test
+in_dev/

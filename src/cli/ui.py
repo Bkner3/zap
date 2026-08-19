@@ -12,10 +12,13 @@ def show_on_start(corversion):
     ╚══════╝╚═╝  ╚═╝╚═╝ PM"""
     config = read_config()
     if config.get("show_logo", True):
-            if config.get("type_logo", "original") == "original":
+            if config.get("use_user_logo", "False") == "False":
                 print(f"{Style.BRIGHT} {logo}")
             else:
-                print(f"{Style.BRIGHT} {config.get('type_logo')}")
+                if config.get("user_logo") is None:
+                    print(f"{Style.BRIGHT} {logo}")
+                else:
+                    print(f"{Style.BRIGHT} {config.get('user_logo')}")
 
     print(Style.BRIGHT + Fore.GREEN + f"Zippy Asset Packager - {corversion}")
     print(Fore.CYAN + "──────────────────────────────────────────")

@@ -46,7 +46,7 @@ def install(packages, process="package"):
         package_desc = package["description"]
         package_exec = package["exec_file"]
 
-        log_info("Package name: {package_name}, Package version {package_version}")
+        log_info(f"Package name: {package_name}, Package version {package_version}")
 
         filename = f"{package_name}.zip"
         file_path = path.join(ext_path, filename)

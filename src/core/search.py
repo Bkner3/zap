@@ -15,6 +15,8 @@ def search_repo_packages(packages):
     pending = set(packages)
     found = set()
 
+    dependencies = []
+
     for file in listdir(tmp_path):
         if not pending:
             break
@@ -31,6 +33,8 @@ def search_repo_packages(packages):
                         
                         pkg["repo"] = data.get("repo", "unknown")
                         pkg["url"] = base_url + pkg["url"]
+
+                        dependencies.append(pkg["dependencies"])
                         
                         all_found_packages.append(pkg)
                         found.add(pkg_name)
@@ -41,9 +45,35 @@ def search_repo_packages(packages):
 
     missingwf = set(packages) - found
     missing = missingwf - set(os_notsupported)
-
+    
     return {
         "packages": all_found_packages,
         "missing": list(missing),
         "os_notsupported": os_notsupported
     }
+
+
+
+def search_cli(packages):
+    found = []
+    search_term = str(packages).lower()
+
+    for file in listdir(tmp_path):
+        if file.endswith(".json"):
+            data = read_json(path.join(tmp_path, file))
+            base_url = data.get("base_url", "").rstrip("/")
+        
+            for pkg in data.get("packages", []):
+                pkg_name = pkg.get("name", "")
+                
+                # Procura se o termo pesquisado faz parte do nome do pacote (case-insensitive)
+                if search_term in pkg_name.lower():
+                    repo_url = f"{base_url}/{pkg_name}" if base_url else ""
+                    
+                    found.append({
+                        "pacote": pkg,
+                        "repositorio": repo_url
+                    })
+
+    # Imprime a lista diretamente na consola em vez de retornar
+    print(found)

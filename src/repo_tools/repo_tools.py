@@ -1,6 +1,9 @@
+#This File is not in use.
+#But the functions will be used.
+
 from src.utils.json_utils import *
 import os
-from src.repo_tools.repo_tools_cli import repo_cli
+
 from datetime import date
 from src.zap_path import PathManager
 from colorama import Fore, Style
@@ -61,6 +64,4 @@ def repo_tools():
             index_file, success = select_index()
         case _:
             print("Invalid choice. Please select a valid option.")
-    if success:
-        repo_cli(index_file)
         

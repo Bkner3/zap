@@ -12,6 +12,7 @@ from src.repo_tools.repo_tools import repo_tools
 from src.core.update import update, upgrade
 from src.utils.write_logs import log_info, log_error
 from src.core.info import info
+from src.core.search import search_cli
 
 from src.cli.ui import show_on_start, show_help
 
@@ -53,7 +54,8 @@ def start(current_dir, corversion):
         "list": list_packages,
         "help": show_help,
         "info": lambda: info(packages),
-        "config": lambda: config_zap(packages[0]) if packages else print("Error: No package provided for config."),
+        "config": lambda: config_zap(packages[0]) if packages else config_zap(),
+        "search": lambda: search_cli(packages),
         "update": lambda: update(),
         "upgrade": lambda: upgrade(corversion),
         "reset-db": lambda: reset_db(),
