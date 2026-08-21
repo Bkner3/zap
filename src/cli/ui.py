@@ -12,7 +12,7 @@ def show_on_start(corversion):
     ╚══════╝╚═╝  ╚═╝╚═╝ PM"""
     config = read_config()
     if config.get("show_logo", True):
-            if config.get("use_user_logo", "False") == "False":
+            if config.get("use_user_logo", False) == False:
                 print(f"{Style.BRIGHT} {logo}")
             else:
                 if config.get("user_logo") is None:

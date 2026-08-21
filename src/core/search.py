@@ -55,25 +55,4 @@ def search_repo_packages(packages):
 
 
 def search_cli(packages):
-    found = []
-    search_term = str(packages).lower()
-
-    for file in listdir(tmp_path):
-        if file.endswith(".json"):
-            data = read_json(path.join(tmp_path, file))
-            base_url = data.get("base_url", "").rstrip("/")
-        
-            for pkg in data.get("packages", []):
-                pkg_name = pkg.get("name", "")
-                
-                # Procura se o termo pesquisado faz parte do nome do pacote (case-insensitive)
-                if search_term in pkg_name.lower():
-                    repo_url = f"{base_url}/{pkg_name}" if base_url else ""
-                    
-                    found.append({
-                        "pacote": pkg,
-                        "repositorio": repo_url
-                    })
-
-    # Imprime a lista diretamente na consola em vez de retornar
-    print(found)
+    pass 

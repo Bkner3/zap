@@ -54,7 +54,7 @@ def start(current_dir, corversion):
         "list": list_packages,
         "help": show_help,
         "info": lambda: info(packages),
-        "config": lambda: config_zap(packages[0]) if packages else config_zap(),
+        "config": lambda: config_zap(packages) if packages else config_zap(),
         "search": lambda: search_cli(packages),
         "update": lambda: update(),
         "upgrade": lambda: upgrade(corversion),
