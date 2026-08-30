@@ -1,8 +1,19 @@
 from platform import system
 from src.utils.write_logs import log_info, log_warning
+from src.zap_path import PathManager
 import os
 
-def create_launcher(name, executable_path, symlinks_path):
+symlinks_path = PathManager.get("sl")
+bin_path = PathManager.get("sl")
+
+def create_launcher(package):
+
+    name = package["name"]
+    version = package["version"]
+
+    install_folder = os.path.join(bin_path, name, str(version))
+    executable_path = os.path.join(install_folder, package["exec_file"])
+    
     if system() == "Windows":
         bat_file = os.path.join(symlinks_path, f"{name}.bat")
         with open(bat_file, "w") as f:

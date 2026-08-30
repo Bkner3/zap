@@ -19,7 +19,8 @@ def create_tables():
         CREATE TABLE IF NOT EXISTS packages (
             name TEXT PRIMARY KEY,
             version TEXT,
-            description TEXT
+            description TEXT,
+            dependencies TEXT
         )
         """)
 
@@ -67,19 +68,24 @@ def recreate_db():
     print("Database recreated.")
 
 
-def save_package(name, version, description):
+def save_package(name, version, description, dependencies=None):
     init_db()
     log_info(f"Saving the {name}, {version} to the DataBase")
+
+    if isinstance(dependencies, list):
+        dependencies = ", ".join(dependencies)
+
     with get_connection() as conn:
         cursor = conn.cursor()
 
         cursor.execute("""
-        INSERT INTO packages (name, version, description)
-        VALUES (?, ?, ?)
+        INSERT INTO packages (name, version, description, dependencies)
+        VALUES (?, ?, ?, ?)
         ON CONFLICT(name) DO UPDATE SET
             version = excluded.version,
-            description = excluded.description
-        """, (name, version, description))
+            description = excluded.description,
+            dependencies = excluded.dependencies
+        """, (name, version, description, dependencies))
 
         conn.commit()
 
@@ -91,7 +97,7 @@ def get_all_packages():
         cursor = conn.cursor()
 
         cursor.execute("""
-        SELECT name, version, description
+        SELECT name, version, description, dependencies
         FROM packages
         """)
 
@@ -105,7 +111,7 @@ def get_package(name):
         cursor = conn.cursor()
 
         cursor.execute("""
-        SELECT name, version, description
+        SELECT name, version, description, dependencies
         FROM packages
         WHERE name = ?
         """, (name,))

@@ -108,7 +108,8 @@ To display all available commands, run:
 ```bat
 zap help
 ```
-
+>**Warning**
+>If you installed zap by the instalation script you only need to type 'zap help' to display the avaiable commands.
 ---
 
 # Commands
@@ -128,6 +129,7 @@ zap <command> [package]
 | repo-remove | Remove a repository URL |
 | update | Updates all installed packages |
 | upgrade | Upgrades zap to the latest version (experimental)|
+|config| This command is used to change zap style, like changing the logo or enable debug|
 | list | List installed packages |
 | info | Display package information |
 | help | Show the help message |

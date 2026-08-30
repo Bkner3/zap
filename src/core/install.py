@@ -31,7 +31,7 @@ def install(packages, process="package"):
         return
     
     log_info(f"Searching from {successful_packages} in the index list.")
-    index = search_repo_packages(successful_packages)
+    index = search_repo_packages(successful_packages, skip_confirmation=True)
 
     log_info("Download completed. Installing packages...")
     print("\nDownload completed. Installing packages...")
@@ -45,6 +45,7 @@ def install(packages, process="package"):
         package_version = package["version"]
         package_desc = package["description"]
         package_exec = package["exec_file"]
+        package_dependencies = package.get("dependencies", None)
 
         log_info(f"Package name: {package_name}, Package version {package_version}")
 
@@ -53,7 +54,7 @@ def install(packages, process="package"):
         
         print(f"\nInstalling {Fore.LIGHTMAGENTA_EX}{package_name}{Fore.RESET}...")
 
-        install_folder = path.join(bin_path, package_name)
+        install_folder = path.join(bin_path, package_name, str(package_version))
         target_file = path.join(install_folder, filename)
 
         if not path.exists(install_folder):
@@ -69,14 +70,16 @@ def install(packages, process="package"):
 
         executable_path = path.join(install_folder, package_exec)
 
-        create_launcher(package_name, executable_path, symlinks_path)
+        create_launcher(package)
 
-        print(f"Created launcher for {package_name}.")
+            #create_launcher(package_name, executable_path, symlinks_path)
+
 
         save_package(
             package_name,
             package_version,
-            package_desc
+            package_desc,
+            package_dependencies
         )
         print(f"Saved {package_name} to database.")
         log_info(f"Installed {package_name} successfully.")

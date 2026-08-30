@@ -1,6 +1,7 @@
 from platform import system
+from subprocess import run
 from colorama import Style, Fore
-from os import getenv
+from os import getenv, startfile
       
 def get_user_path():
     if system() == "Windows":
@@ -15,3 +16,11 @@ def get_user_path():
     else:
         print(Style.BRIGHT + Fore.RED + "Unsupported system!")
         exit()
+
+def open_folder(folder):
+    if system() == "Windows":
+        startfile(folder)
+    elif system() == "Darwin":
+        run(["open", folder])
+    elif system() == "Linux":
+        run(["xdg-open", folder])

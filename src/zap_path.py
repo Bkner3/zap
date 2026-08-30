@@ -31,6 +31,7 @@ class PathManager:
             "ext": join(user_root, "runtime", "ext"),
             "download": join(user_root, "runtime", "down"),
             "tmp": join(user_root, "runtime", "tmp"),
+            "setup": join(user_root, "runtime", "setup"),
 
             # Files (runtime)
             "tmp_packages": join(user_root, "runtime", "tmp", "Packages_tmp.json")

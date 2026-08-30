@@ -1,4 +1,3 @@
-
 from src.db.database import get_all_packages
 from src.utils.write_logs import log_info, log_warning
 
@@ -8,8 +7,8 @@ def list_packages():
         log_warning("No packages installed.")
         print("No packages installed.")
     else:
-        print("Package list:")
+        print("Package list:\nName | Version | Description | Dependencies")
         log_info("Package list:")
         log_info(packages)
         for package in packages:
-            print(", ".join(package))
+            print(", ".join(map(str, package)))

@@ -131,14 +131,14 @@ def download_index(cfg):
         log_info(f"Renamed {index_file} to {final_path}")
 
 
-def only_download(packages, process="package"):
+def only_download(packages, process="package", download_dependencies=True):
     cfg = get_context()
     if process == "update":
         pass
     else:
         download_index(cfg)
 
-    data = search_repo_packages(packages)
+    data = search_repo_packages(packages, search_dependencies=download_dependencies)
     packages_to_download = data.get("packages", [])
     missing = data.get("missing", [])
     notsupported = data.get("os_notsupported", [])
@@ -194,7 +194,7 @@ def download_to(packages, destination):
 
     before = set(os.listdir(ext_path))
 
-    only_download(packages, "package")
+    only_download(packages, "package", download_dependencies=False)
 
     after = set(os.listdir(ext_path))
 

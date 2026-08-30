@@ -7,8 +7,11 @@ from src.zap_path import PathManager
 from os.path import exists
 from os import remove
 from src.utils.write_logs import log_info
+from src.utils.sys_utils import open_folder
+from src.core.confirm import confirm
 
 config_file = PathManager.get("config_file")
+data_folder = PathManager.get("data")
 
 def config_zap(packages=None):
     config = read_config()
@@ -22,6 +25,14 @@ def config_zap(packages=None):
     elif command == "list" or command is None:
         for config_key in config:
             print(f"Key: {config_key}, Value: {config[config_key]}")
+    elif command == "open":
+        print("Do you want to open the data folder?")
+        if confirm():
+            log_info("Opening the data folder in the explorer.")
+            print("Opening in the explorer.")
+            open_folder(data_folder)
+        exit(0)
+
     elif command == "set":
 
         if parameter[0] in config:
