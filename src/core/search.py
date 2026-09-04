@@ -9,79 +9,163 @@ from src.utils.write_logs import log_info, log_debug, log_warning
 tmp_path = PathManager.get("tmp")
 current_os = system()
 
-# 1 - Receber indicações,
-# 2 - procurar
-# 3 - Ver dependencias
-# 4 - Ver dependencias de dependencias
-# 5 - Passar para o proximo
+
+def version_tuple(version):
+    return tuple(map(int, version.split(".")))
+
+
+def separate_name_from_version(package):
+    if "@" in package:
+        name, version = package.split("@", 1)
+        return name, version
+
+    return package, False
+
+
+def compare_versions_symbols(need_version, attempt_version2):
+    operators = [">=", "<=", "=", ">", "<"]
+
+    operator = "="
+
+    for op in operators:
+        if need_version.startswith(op):
+            operator = op
+            need_version = need_version[len(op):]
+            break
+
+    v1_tuple = version_tuple(need_version)
+    v2_tuple = version_tuple(attempt_version2)
+
+    if operator == ">=":
+        return v2_tuple >= v1_tuple
+    elif operator == "<=":
+        return v2_tuple <= v1_tuple
+    elif operator == "=":
+        return v2_tuple == v1_tuple
+    elif operator == ">":
+        return v2_tuple > v1_tuple
+    elif operator == "<":
+        return v2_tuple < v1_tuple
+
+    return False
+
+
 def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False, search_dependencies=True):
     log_info("Searching for packages...")
     log_debug("Advanced information!")
     os_notsupported = []
     all_found_packages = []
-
-    pending = set(packages)
     found = set()
-
     dependencies = []
+    pending = {}
+
+    for package in packages:
+        pkg_name, pkg_version_needed = separate_name_from_version(package)
+        pending[pkg_name] = pkg_version_needed
 
     for file in listdir(tmp_path):
         if not pending:
             break
 
-        if file.endswith(".json"):
-            log_debug(f"Reading '{path.join(tmp_path, file)}'. ")
-            data = read_json(path.join(tmp_path, file))
-            base_url = data.get("base_url", "")
+        if not file.endswith(".json"):
+            continue
 
-            for pkg in data.get("packages", []):
+        file_path = path.join(tmp_path, file)
+        log_debug(f"Reading '{file_path}'.")
+        data = read_json(file_path)
+        base_url = data.get("base_url", "")
 
-                pkg_name = pkg.get("name")
-                log_debug(f"Package: {pkg_name}. ")
+        for pkg in data.get("packages", []):
 
-                if pkg_name in pending:
-                    if pkg.get("system") == current_os:
+            if not pending:
+                break
 
-                        pkg["repo"] = data.get("repo", "unknown")
-                        pkg["url"] = base_url + pkg["url"]
-                        pkg_dependencies = pkg.get("dependencies", False)
+            pkg_name = pkg.get("name")
 
-                        if pkg_dependencies is not False:
-                            dependencies.extend(
-                                x for x in pkg_dependencies
-                                if x not in dependencies
-                            )
+            if not pkg_name:
+                continue
 
-                        log_debug("Found.")
+            if pkg_name not in pending:
+                continue
 
-                        all_found_packages.append(pkg)
-                        found.add(pkg_name)
+            version_needed = pending.get(pkg_name)
 
-                        pending.remove(pkg_name)
+            log_debug(f"Package: {pkg_name}.")
 
-                    else:
-                        os_notsupported.append(pkg_name)
-                        log_warning(f"Your os do not support '{pkg_name}'.")
+            if pkg.get("system") != current_os:
 
-    missingwf = set(packages) - found
-    missing = missingwf - set(os_notsupported)
+                if pkg_name not in os_notsupported:
+                    os_notsupported.append(pkg_name)
 
-    if dependencies and search_dependencies == True:
+                log_warning(
+                    f"Your os do not support '{pkg_name}'."
+                )
+
+                continue
+
+            pkg_version = pkg.get("version", "0.0.0")
+
+            if version_needed:
+
+                if not compare_versions_symbols(
+                    version_needed,
+                    pkg_version
+                ):
+                    log_debug(
+                        f"Version mismatch for '{pkg_name}': "
+                        f"needed '{version_needed}', "
+                        f"found '{pkg_version}'."
+                    )
+
+                    continue
+
+            pkg["repo"] = data.get("repo", "unknown")
+            pkg["url"] = base_url + pkg.get("url", "")
+
+            log_debug(
+                f"Found '{pkg_name}@{pkg_version}'."
+            )
+
+            all_found_packages.append(pkg)
+            found.add(pkg_name)
+
+            pending.pop(pkg_name)
+
+            if search_dependencies:
+
+                pkg_dependencies = pkg.get("dependencies", [])
+
+                for dependency in pkg_dependencies:
+
+                    if dependency not in dependencies:
+                        dependencies.append(dependency)
+
+    missing = set(pending.keys()) - found
+    missing -= set(os_notsupported)
+
+    if dependencies and search_dependencies:
+
         result = search_repo_packages(
             dependencies,
-            Number_of_process=Number_of_process + 1
+            Number_of_process=Number_of_process + 1,
+            skip_confirmation=True,
+            search_dependencies=True
         )
 
-        all_found_packages.extend(
-            x for x in result["packages"]
-            if x not in all_found_packages
-        )
+        for pkg in result["packages"]:
 
-        missing = result["missing"]
-        os_notsupported.extend(
-            x for x in result["os_notsupported"]
-            if x not in os_notsupported
-        )
+            if pkg not in all_found_packages:
+                all_found_packages.append(pkg)
+
+        for package in result["missing"]:
+
+            if package not in missing:
+                missing.add(package)
+
+        for package in result["os_notsupported"]:
+
+            if package not in os_notsupported:
+                os_notsupported.append(package)
 
     if Number_of_process > 0:
         return {
@@ -89,19 +173,29 @@ def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False,
             "missing": list(missing),
             "os_notsupported": os_notsupported
         }
-    
+
     if not all_found_packages:
         print("Package not found")
-        log_warning("Package not found, exiting")
+
+        log_warning(
+            "Package not found, exiting"
+        )
+
         exit(0)
-    if skip_confirmation is True:
-            return {
-                "packages": all_found_packages,
-                "missing": list(missing),
-                "os_notsupported": os_notsupported
-            }
-    
-    print("\nPackages to be installed:\n" if search_dependencies == True else "\nPackages to be downloaded:\n" )
+
+    if skip_confirmation:
+
+        return {
+            "packages": all_found_packages,
+            "missing": list(missing),
+            "os_notsupported": os_notsupported
+        }
+
+    print(
+        "\nPackages to be installed:\n"
+        if search_dependencies
+        else "\nPackages to be downloaded:\n"
+    )
 
     for pkg in all_found_packages:
         print(
@@ -110,10 +204,12 @@ def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False,
             f"  [{pkg.get('repo', 'unknown')}]"
         )
 
-    print(f"\nTotal: {len(all_found_packages)} packages")
-    if skip_confirmation is False:
-        if confirm() is False:
-            exit(0)
+    print(
+        f"\nTotal: {len(all_found_packages)} packages"
+    )
+
+    if confirm() is False:
+        exit(0)
 
     return {
         "packages": all_found_packages,
