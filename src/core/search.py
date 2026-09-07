@@ -2,52 +2,13 @@ from os import path, listdir
 from platform import system
 
 from src.core.confirm import confirm
+from src.utils.versions_utils import compare_versions_symbols, separate_name_from_version
 from src.zap_path import PathManager
 from src.utils.json_utils import read_json
 from src.utils.write_logs import log_info, log_debug, log_warning
 
 tmp_path = PathManager.get("tmp")
 current_os = system()
-
-
-def version_tuple(version):
-    return tuple(map(int, version.split(".")))
-
-
-def separate_name_from_version(package):
-    if "@" in package:
-        name, version = package.split("@", 1)
-        return name, version
-
-    return package, False
-
-
-def compare_versions_symbols(need_version, attempt_version2):
-    operators = [">=", "<=", "=", ">", "<"]
-
-    operator = "="
-
-    for op in operators:
-        if need_version.startswith(op):
-            operator = op
-            need_version = need_version[len(op):]
-            break
-
-    v1_tuple = version_tuple(need_version)
-    v2_tuple = version_tuple(attempt_version2)
-
-    if operator == ">=":
-        return v2_tuple >= v1_tuple
-    elif operator == "<=":
-        return v2_tuple <= v1_tuple
-    elif operator == "=":
-        return v2_tuple == v1_tuple
-    elif operator == ">":
-        return v2_tuple > v1_tuple
-    elif operator == "<":
-        return v2_tuple < v1_tuple
-
-    return False
 
 
 def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False, search_dependencies=True):

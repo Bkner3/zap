@@ -49,7 +49,7 @@ def install(packages, process="package"):
 
         log_info(f"Package name: {package_name}, Package version {package_version}")
 
-        filename = f"{package_name}.zip"
+        filename = f"{package_name}-{package_version}.zip"
         file_path = path.join(ext_path, filename)
         
         print(f"\nInstalling {Fore.LIGHTMAGENTA_EX}{package_name}{Fore.RESET}...")
@@ -70,7 +70,7 @@ def install(packages, process="package"):
 
         executable_path = path.join(install_folder, package_exec)
 
-        create_launcher(package)
+        create_launcher(package, index)
 
             #create_launcher(package_name, executable_path, symlinks_path)
 

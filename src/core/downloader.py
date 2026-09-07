@@ -164,7 +164,7 @@ def only_download(packages, process="package", download_dependencies=True):
         log_info(f"Name: {name}, URL: {url}")
 
         extension = Path(url).suffix
-        output_name = f"{name}{extension}"
+        output_name = f"{name}-{package['version']}{extension}"
 
         thread = Thread(
             target=download_worker,

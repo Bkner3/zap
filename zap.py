@@ -31,7 +31,7 @@ from src.utils.write_logs import log_info, log_debug
 from src.cli.parser import start
 
 #ZAP STARTING
-corversion = "v0.6.6-beta"
+corversion = "v0.7.0-beta"
 current_dir = os.getcwd()
 tmp_path = PathManager.get("tmp")
 
@@ -48,17 +48,6 @@ if os.path.exists(tmp_path):
 
 if __name__ == "__main__":
     if system() == "Linux":
-
-        while True:
-            print("Zap\nThe Linux version can be unstable and not tested yet.")
-
-            opt = input("[y] - yes\n[n] - no\n> ").lower()
-
-            if opt == "y":
-                break
-            elif opt == "n":
-                exit()
-            else:
-                print("Wrong option")
-
+        print("Zap\nThe Linux version cannot be used yet, it is still in development.\n")
+        exit(0)
     start(current_dir, corversion)
