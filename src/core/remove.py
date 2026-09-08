@@ -5,6 +5,8 @@ from shutil import rmtree
 from src.db.database import init_db, delete_package
 from colorama import Fore
 
+from src.core.confirm import confirm
+from src.utils.versions_utils import separate_name_from_version
 from src.utils.launcher import remove_launcher 
 from src.utils.write_logs import log_info
 
@@ -20,7 +22,20 @@ def remove(packages):
     init_db()
     
     for package in packages:
-        package_path = path.join(bin_path, package)
+        package, version = separate_name_from_version(package)
+        if version == False:
+            print(f"Remove all versions of '{package}'?")
+            if confirm():
+                package_path = path.join(bin_path, package)
+            else:
+                exit(0)
+
+        else:
+            print(f"Remove '{package}' version '{version}' ?")
+            if confirm():
+                package_path = path.join(bin_path, package, version)
+            else:
+                exit(0)
 
         if not path.exists(package_path):
             log_info(f"Package not found: {package}")
@@ -29,7 +44,7 @@ def remove(packages):
 
         rmtree(package_path)
 
-        remove_launcher(package, symlinks_path, system)
+        remove_launcher(package)
         
         delete_package(package)
         log_info(f"Removed package: {package}")

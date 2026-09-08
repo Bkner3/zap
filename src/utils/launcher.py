@@ -12,7 +12,6 @@ import os
 symlinks_path = PathManager.get("sl")
 bin_path = PathManager.get("bin")
 
-
 def find_available_version(index, dependency):
     dependency_name, required_version = separate_name_from_version(dependency)
 
@@ -397,21 +396,21 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
             )
 
 
-def remove_launcher(name, symlinks_path, system):
+def remove_launcher(name):
 
     launcher_path = (
         os.path.join(
             symlinks_path,
             f"{name}.bat"
         )
-        if system == "Windows"
+        if system() == "Windows"
         else os.path.join(
             symlinks_path,
             name
         )
     )
 
-    if system == "Windows":
+    if system() == "Windows":
 
         if os.path.exists(launcher_path):
             os.remove(launcher_path)
@@ -428,7 +427,7 @@ def remove_launcher(name, symlinks_path, system):
                 f"Launcher not found: {name}.bat"
             )
 
-    elif system == "Linux":
+    elif system() == "Linux":
 
         if os.path.lexists(launcher_path):
             os.remove(launcher_path)
