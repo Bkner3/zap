@@ -17,8 +17,6 @@ def remove(packages):
         return
         
     bin_path = PathManager.get("bin")
-    symlinks_path = PathManager.get("sl")
-    system = get_system()
     init_db()
     
     for package in packages:
@@ -27,6 +25,7 @@ def remove(packages):
             print(f"Remove all versions of '{package}'?")
             if confirm():
                 package_path = path.join(bin_path, package)
+                version = None
             else:
                 exit(0)
 
@@ -46,6 +45,6 @@ def remove(packages):
 
         remove_launcher(package)
         
-        delete_package(package)
+        delete_package(package, version)
         log_info(f"Removed package: {package}")
         print(f"Removed package: {Fore.MAGENTA + package}")

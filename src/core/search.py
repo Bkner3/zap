@@ -3,6 +3,7 @@ from platform import system
 
 from src.core.confirm import confirm
 from src.utils.versions_utils import compare_versions_symbols, separate_name_from_version
+from src.core.verify_int import verify_dependencies
 from src.zap_path import PathManager
 from src.utils.json_utils import read_json
 from src.utils.write_logs import log_info, log_debug, log_warning
@@ -10,10 +11,13 @@ from src.utils.write_logs import log_info, log_debug, log_warning
 tmp_path = PathManager.get("tmp")
 current_os = system()
 
-
 def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False, search_dependencies=True):
     log_info("Searching for packages...")
     log_debug("Advanced information!")
+
+    if Number_of_process == 0:
+        original_packages = packages
+
     os_notsupported = []
     all_found_packages = []
     found = set()
@@ -134,8 +138,19 @@ def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False,
             "missing": list(missing),
             "os_notsupported": os_notsupported
         }
+    blocked_packages = False
+    
+    if search_dependencies:
+        all_found_packages, blocked_packages = verify_dependencies(all_found_packages, original_packages)
 
     if not all_found_packages:
+        if blocked_packages:
+            print("\nPackage blocked by dependencies not found:")
+
+            for pkg in blocked_packages:
+                print(f"  {pkg['name']} {pkg['version']}")
+            exit(0)
+
         print("Package not found")
 
         log_warning(
@@ -145,11 +160,11 @@ def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False,
         exit(0)
 
     if skip_confirmation:
-
         return {
             "packages": all_found_packages,
             "missing": list(missing),
-            "os_notsupported": os_notsupported
+            "os_notsupported": os_notsupported,
+            "blocked": blocked_packages
         }
 
     print(
@@ -169,11 +184,20 @@ def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False,
         f"\nTotal: {len(all_found_packages)} packages"
     )
 
+    if blocked_packages:
+        print("\nBlocked packages:")
+
+        for pkg in blocked_packages:
+            print(
+                f"  {pkg['name']} {pkg['version']}"
+            )
+
     if confirm() is False:
         exit(0)
 
     return {
         "packages": all_found_packages,
         "missing": list(missing),
-        "os_notsupported": os_notsupported
+        "os_notsupported": os_notsupported,
+        "blocked": blocked_packages
     }

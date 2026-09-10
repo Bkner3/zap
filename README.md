@@ -247,6 +247,8 @@ zap <command> [package]
 
 > **Warning**
 > `zap upgrade` is only supported when running the compiled ZAP executable.
+> `zap download` does not download the dependencies!!!
+>
 
 ---
 

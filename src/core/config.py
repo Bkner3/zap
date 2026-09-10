@@ -2,7 +2,6 @@ import json
 import os
 
 from src.utils.json_utils import save_json, read_json, create_json
-from colorama import Fore
 from src.zap_path import PathManager
 from os.path import exists
 from os import remove

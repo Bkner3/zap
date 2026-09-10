@@ -30,7 +30,7 @@ def get_context():
     }
 
 
-def download(url, output_name, file_type, cfg):
+def download(url, output_name, file_type, cfg, position=0):
     base_dir = cfg["download"] if file_type == "Index" else cfg["ext"]
     output_path = os.path.join(base_dir, output_name)
     headers = {"User-Agent": "ZAP-PackageManager"}
@@ -54,6 +54,8 @@ def download(url, output_name, file_type, cfg):
                 ncols=100,
                 ascii=" ━",
                 colour="white",
+                position=position,
+                leave=True,
                 bar_format="{desc} {percentage:3.0f}% |{bar}| {n_fmt}/{total_fmt} @ {rate_fmt}",
             ) as progress:
 
@@ -155,9 +157,9 @@ def only_download(packages, process="package", download_dependencies=True):
     print(Style.BRIGHT + Fore.BLUE + "\nStarting package download\n")
     log_info("Starting package download.")
 
-    for package in packages_to_download:
+    for position, package in enumerate(packages_to_download):
         url = package["url"]
-
+        version = package["version"]
         name = package["name"]
         expected_hash = package["hash"]
         
@@ -167,9 +169,9 @@ def only_download(packages, process="package", download_dependencies=True):
         output_name = f"{name}-{package['version']}{extension}"
 
         thread = Thread(
-            target=download_worker,
-            args=(url, output_name, cfg, downloaded, failed, name, expected_hash)
-        )
+            target=download_worker, 
+            args=(url,output_name,cfg,downloaded,failed,name,version, expected_hash, position)
+        )   
 
         thread.start()
         threads.append(thread)
@@ -207,19 +209,35 @@ def download_to(packages, destination):
         move(source, target)
 
 
-def download_worker(url, output_name, cfg, downloaded, failed, name, expected_hash):
-    result = download(url, output_name, "package", cfg)
+def download_worker(
+    url,
+    output_name,
+    cfg,
+    downloaded,
+    failed,
+    name,
+    version,
+    expected_hash,
+    position
+):
+    result = download(url, output_name, "package", cfg, position=position )
     log_info(f"Checking the integrity of {result}")
     if result and os.path.exists(result):
         download_file_hash = calculate_hash(result)
 
         if download_file_hash == expected_hash.upper():
             log_info(f"The {name} hash matched.")
-            downloaded.append(name)
+
+            downloaded.append(f"{name}@{version}")
+
         else:
             log_error(f"SHA256 mismatch! Removing {result}")
-            print(f"{Fore.RED + Style.BRIGHT}SHA256 mismatch! Removing {result}")
-            failed.append(name)
+            print(
+                f"{Fore.RED + Style.BRIGHT}"
+                f"SHA256 mismatch! Removing {result}"
+            )
+
+            failed.append(f"{name}@{version}")
             os.remove(result)
     else:
-        failed.append(name)
+        failed.append(f"{name}@{version}")

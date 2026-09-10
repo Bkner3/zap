@@ -10,7 +10,7 @@ def get_user_path():
     elif system() == "Linux":
         user = getenv("USER")
         return f"/home/{user}/.zap/"
-    elif system() == "MacOS":
+    elif system() == "Darwin":
         print(Style.BRIGHT + Fore.RED + "Say no to mac!")
         exit()
     else:

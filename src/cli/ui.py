@@ -1,6 +1,5 @@
 from src.core.config import read_config
 from colorama import Style, Fore, init
-init(autoreset=True)
 
 def show_on_start(corversion):
     logo = """

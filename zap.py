@@ -3,7 +3,7 @@
 
 """
 Zippy Asset Packager - A simple package manager
-#Version: 0.6.6-beta
+#Version: 0.7.0-beta
 Github: https://github.com/Bkner3/zap
 This project is in early development, expect bugs and missing features.
 """
@@ -48,6 +48,12 @@ if os.path.exists(tmp_path):
 
 if __name__ == "__main__":
     if system() == "Linux":
+        #ENDS THE LINUX EXECUTION BECAUSE THE FUNCTION TO CREATE LAUNCHERS ARE NOT ADEPT TO LINUX
         print("Zap\nThe Linux version cannot be used yet, it is still in development.\n")
         exit(0)
-    start(current_dir, corversion)
+        
+    if system() == "Windows" or system() == "Linux":
+        start(current_dir, corversion)
+
+    print(f"{system()} not supported!!!")
+    exit(0)

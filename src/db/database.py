@@ -1,7 +1,9 @@
 import sqlite3
 import os
+
 from src.zap_path import PathManager
 from src.utils.write_logs import log_info, log_warning, log_debug
+
 
 DB_PATH = os.path.join(PathManager.get("data"), "zap.db")
 
@@ -12,15 +14,18 @@ def get_connection():
 
 def create_tables():
     log_info("Creating the DataBase tables.")
+
     with get_connection() as conn:
         cursor = conn.cursor()
 
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS packages (
-            name TEXT PRIMARY KEY,
-            version TEXT,
+            name TEXT NOT NULL,
+            version TEXT NOT NULL,
+            author TEXT,
             description TEXT,
-            dependencies TEXT
+            dependencies TEXT,
+            PRIMARY KEY (name, version)
         )
         """)
 
@@ -33,7 +38,11 @@ def init_db():
 
 
 def reset_db():
-    log_warning("reset_db was called. If confirmed by the user, the database will be reset.")
+    log_warning(
+        "reset_db was called. If confirmed by the user, "
+        "the database will be reset."
+    )
+
     print("This will reset the database, all package information will be lost.")
     confirm = input("Are you sure? (y/n): ").strip().lower()
 
@@ -67,10 +76,11 @@ def recreate_db():
     log_info("Database recreated.")
     print("Database recreated.")
 
-
-def save_package(name, version, description, dependencies=None):
+def save_package(name, version, author, description, dependencies=None):
     init_db()
-    log_info(f"Saving the {name}, {version} to the DataBase")
+    log_info(
+        f"Saving {name} {version} by {author} to the DataBase"
+    )
 
     if isinstance(dependencies, list):
         dependencies = ", ".join(dependencies)
@@ -79,13 +89,26 @@ def save_package(name, version, description, dependencies=None):
         cursor = conn.cursor()
 
         cursor.execute("""
-        INSERT INTO packages (name, version, description, dependencies)
-        VALUES (?, ?, ?, ?)
-        ON CONFLICT(name) DO UPDATE SET
-            version = excluded.version,
+        INSERT INTO packages (
+            name,
+            version,
+            author,
+            description,
+            dependencies
+        )
+        VALUES (?, ?, ?, ?, ?)
+
+        ON CONFLICT(name, version) DO UPDATE SET
+            author = excluded.author,
             description = excluded.description,
             dependencies = excluded.dependencies
-        """, (name, version, description, dependencies))
+        """, (
+            name,
+            version,
+            author,
+            description,
+            dependencies
+        ))
 
         conn.commit()
 
@@ -97,50 +120,96 @@ def get_all_packages():
         cursor = conn.cursor()
 
         cursor.execute("""
-        SELECT name, version, description, dependencies
+        SELECT
+            name,
+            version,
+            author,
+            description,
+            dependencies
         FROM packages
+        ORDER BY name, version
         """)
 
         return cursor.fetchall()
 
 
-def get_package(name):
+def get_package(name, version=None):
     init_db()
 
     with get_connection() as conn:
         cursor = conn.cursor()
 
-        cursor.execute("""
-        SELECT name, version, description, dependencies
-        FROM packages
-        WHERE name = ?
-        """, (name,))
+        if version is not None:
+            cursor.execute("""
+            SELECT
+                name,
+                version,
+                author,
+                description,
+                dependencies
+            FROM packages
+            WHERE name = ? AND version = ?
+            """, (name, version))
 
-        result = cursor.fetchone()
+            result = cursor.fetchone()
+
+        else:
+            cursor.execute("""
+            SELECT
+                name,
+                version,
+                author,
+                description,
+                dependencies
+            FROM packages
+            WHERE name = ?
+            ORDER BY version
+            """, (name,))
+
+            result = cursor.fetchall()
 
         if result:
-            log_info(f"Returning information for package '{name}'")
+            log_info(
+                f"Returning information for package '{name}'"
+            )
         else:
-            log_warning(f"Package '{name}' not found")
+            log_warning(
+                f"Package '{name}' not found"
+            )
 
         return result
 
 
-def delete_package(name):
+def delete_package(name, version=None):
     init_db()
+
     with get_connection() as conn:
         cursor = conn.cursor()
 
-        cursor.execute("""
-        DELETE FROM packages
-        WHERE name = ?
-        """, (name,))
+        if version is not None:
+            cursor.execute("""
+            DELETE FROM packages
+            WHERE name = ? AND version = ?
+            """, (name, version))
+
+            deleted_message = f"Package {name} {version} removed from the database."
+            not_found_message = f"Package {name} {version} not found on the database."
+
+        else:
+            cursor.execute("""
+            DELETE FROM packages
+            WHERE name = ?
+            """, (name,))
+
+            deleted_message = f"All versions of package {name} removed from the database."
+            not_found_message = f"Package {name} not found on the database."
 
         conn.commit()
 
         if cursor.rowcount > 0:
-            log_info(f"Package {name} removed from the database.")
-            print(f"Package {name} removed from the database.")
+            log_info(deleted_message)
+            print(deleted_message)
         else:
-            log_warning(f"Package {name} not found on the database.")
-            print(f"Package {name} not found on the database.")
+            log_warning(not_found_message)
+            print(not_found_message)
+

@@ -8,7 +8,6 @@ from src.core.install import install
 from src.core.remove import remove
 from src.core.list import list_packages
 from src.db.database import reset_db
-from src.repo_tools.repo_tools import repo_tools
 from src.core.update import update, upgrade
 from src.utils.write_logs import log_info, log_error
 from src.core.info import info

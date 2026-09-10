@@ -7,11 +7,9 @@ from src.utils.zip_utils import extract_zip
 from src.zap_path import PathManager
 from src.db.database import save_package
 from src.core.search import search_repo_packages
-from colorama import Fore, Style, init
+from colorama import Fore, Style
 from platform import system
 from src.utils.write_logs import log_warning, log_info
-
-init(autoreset=True)
 
 def install(packages, process="package"):
     if not packages:
@@ -43,6 +41,7 @@ def install(packages, process="package"):
     for package in index["packages"]:
         package_name = package["name"]
         package_version = package["version"]
+        package_author = package.get("author", "Unknown")
         package_desc = package["description"]
         package_exec = package["exec_file"]
         package_dependencies = package.get("dependencies", None)
@@ -78,6 +77,7 @@ def install(packages, process="package"):
         save_package(
             package_name,
             package_version,
+            package_author,
             package_desc,
             package_dependencies
         )
