@@ -12,6 +12,7 @@ import os
 symlinks_path = PathManager.get("sl")
 bin_path = PathManager.get("bin")
 
+
 def find_available_version(index, dependency):
     dependency_name, required_version = separate_name_from_version(dependency)
 
@@ -46,10 +47,7 @@ def find_available_version(index, dependency):
 
 def find_package(index, name, version):
     for package in index.get("packages", []):
-        if (
-            package["name"] == name
-            and str(package["version"]) == str(version)
-        ):
+        if (package["name"] == name and str(package["version"]) == str(version)):
             return package
 
     return False
@@ -63,33 +61,20 @@ def resolve_dependencies(package, index, resolved=None, resolving=None):
         resolving = []
 
     for dependency in package.get("dependencies", []) or []:
-        dependency_name, dependency_requirement = separate_name_from_version(
-            dependency
-        )
+        dependency_name, dependency_requirement = separate_name_from_version(dependency)
 
-        dependency_version = find_available_version(
-            index,
-            dependency
-        )
+        dependency_version = find_available_version(index,dependency)
 
         if dependency_version is False:
-            log_warning(
-                f"Could not resolve dependency: {dependency}"
-            )
+            log_warning(f"Could not resolve dependency: {dependency}")
             continue
 
-        dependency_key = (
-            dependency_name,
-            dependency_version
-        )
+        dependency_key = (dependency_name,dependency_version)
 
         already_resolved = False
 
         for item in resolved:
-            if (
-                item["name"] == dependency_name
-                and item["version"] == dependency_version
-            ):
+            if (item["name"] == dependency_name and item["version"] == dependency_version):
                 already_resolved = True
                 break
 
@@ -100,33 +85,18 @@ def resolve_dependencies(package, index, resolved=None, resolving=None):
             })
 
         if dependency_key in resolving:
-            log_warning(
-                f"Circular dependency detected: "
-                f"{dependency_name}@{dependency_version}"
-            )
+            log_warning(f"Circular dependency detected: " f"{dependency_name}@{dependency_version}")
             continue
 
-        dependency_package = find_package(
-            index,
-            dependency_name,
-            dependency_version
-        )
+        dependency_package = find_package(index,dependency_name,dependency_version)
 
         if dependency_package is False:
-            log_warning(
-                f"Package not found in index: "
-                f"{dependency_name}@{dependency_version}"
-            )
+            log_warning(f"Package not found in index: " f"{dependency_name}@{dependency_version}")
             continue
 
         resolving.append(dependency_key)
 
-        resolve_dependencies(
-            dependency_package,
-            index,
-            resolved,
-            resolving
-        )
+        resolve_dependencies(dependency_package, index, resolved, resolving)
 
         resolving.remove(dependency_key)
 
@@ -134,10 +104,7 @@ def resolve_dependencies(package, index, resolved=None, resolving=None):
 
 
 def find_latest_installed_version(name):
-    package_bin_path = os.path.join(
-        bin_path,
-        name
-    )
+    package_bin_path = os.path.join(bin_path, name)
 
     if not os.path.isdir(package_bin_path):
         return False
@@ -145,10 +112,7 @@ def find_latest_installed_version(name):
     versions = []
 
     for folder in os.listdir(package_bin_path):
-        folder_path = os.path.join(
-            package_bin_path,
-            folder
-        )
+        folder_path = os.path.join(package_bin_path,folder)
 
         if os.path.isdir(folder_path):
             try:
@@ -163,53 +127,48 @@ def find_latest_installed_version(name):
     return max(versions, key=version_tuple)
 
 
+def find_direct_dependencies(package, index):
+    dependencies = []
+
+    for dependency in package.get("dependencies", []) or []:
+        dependency_name, dependency_requirement = separate_name_from_version(dependency)
+
+        dependency_version = find_available_version(index, dependency)
+
+        if dependency_version is False:
+            log_warning(f"Could not resolve dependency: {dependency}")
+            continue
+
+        dependencies.append({"name": dependency_name,"version": dependency_version})
+
+    return dependencies
+
+
 def create_launcher(package, index):
 
     name = package["name"]
     version = str(package["version"])
     executable = package["exec_file"]
 
-    install_folder = os.path.join(
-        bin_path,
-        name,
-        version
-    )
+    install_folder = os.path.join(bin_path, name, version)
 
-    executable_path = os.path.join(
-        install_folder,
-        executable
-    )
+    executable_path = os.path.join(install_folder, executable)
 
-    dependencies = resolve_dependencies(
-        package,
-        index
-    )
+    # Only direct dependencies are added to the launcher PATH.
+    dependencies = find_direct_dependencies(package, index)
 
     if system() == "Windows":
 
-        package_sl_path = os.path.join(
-            symlinks_path,
-            name
-        )
+        package_sl_path = os.path.join(symlinks_path, name)
 
-        version_sl_path = os.path.join(
-            package_sl_path,
-            version
-        )
+        version_sl_path = os.path.join(package_sl_path, version)
 
-        os.makedirs(
-            version_sl_path,
-            exist_ok=True
-        )
+        os.makedirs(version_sl_path,exist_ok=True)
 
         path_entries = []
 
         for dependency in dependencies:
-            dependency_path = os.path.join(
-                symlinks_path,
-                dependency["name"],
-                dependency["version"]
-            )
+            dependency_path = os.path.join(symlinks_path, dependency["name"], dependency["version"])
 
             path_entries.append(dependency_path)
 
@@ -218,10 +177,7 @@ def create_launcher(package, index):
         if dependency_path_string:
             dependency_path_string += ";"
 
-        version_launcher = os.path.join(
-            version_sl_path,
-            f"{name}.bat"
-        )
+        version_launcher = os.path.join(version_sl_path,f"{name}.bat")
 
         version_script = f'''@echo off
 
@@ -240,52 +196,33 @@ set "PATH={dependency_path_string}%PKG_ORIGINAL_PATH%"
         with open(version_launcher, "w") as f:
             f.write(version_script)
 
-        log_info(
-            f"Writing launcher: {version_launcher}"
-        )
+        log_info(f"Writing launcher: {version_launcher}")
 
         latest_version = find_latest_installed_version(name)
 
         if latest_version is False:
             latest_version = version
 
-        latest_package = find_package(
-            index,
-            name,
-            latest_version
-        )
+        latest_package = find_package(index,name,latest_version)
 
         if latest_package is not False:
 
-            latest_dependencies = resolve_dependencies(
-                latest_package,
-                index
-            )
-
+            # Only direct dependencies are added to the latest launcher.
+            latest_dependencies = find_direct_dependencies(latest_package, index)
+ 
             latest_path_entries = []
 
             for dependency in latest_dependencies:
-                dependency_path = os.path.join(
-                    symlinks_path,
-                    dependency["name"],
-                    dependency["version"]
-                )
+                dependency_path = os.path.join(symlinks_path,dependency["name"],dependency["version"])
 
-                latest_path_entries.append(
-                    dependency_path
-                )
+                latest_path_entries.append(dependency_path)
 
-            latest_dependency_path_string = ";".join(
-                latest_path_entries
-            )
+            latest_dependency_path_string = ";".join(latest_path_entries)
 
             if latest_dependency_path_string:
                 latest_dependency_path_string += ";"
 
-            latest_launcher = os.path.join(
-                symlinks_path,
-                f"{name}.bat"
-            )
+            latest_launcher = os.path.join(symlinks_path,f"{name}.bat")
 
             latest_script = f'''@echo off
 
