@@ -13,6 +13,7 @@ import os
 import sys
 import shutil
 from platform import system
+from colorama import init
 
 #ZAP STARTING PATH SYSTEM
 from src.zap_path import PathManager
@@ -34,6 +35,7 @@ from src.cli.parser import start
 corversion = "v0.7.0-beta"
 current_dir = os.getcwd()
 tmp_path = PathManager.get("tmp")
+init(autoreset=True)
 
 #First logs
 log_info(f"Zap {corversion}")

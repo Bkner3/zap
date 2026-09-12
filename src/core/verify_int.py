@@ -3,7 +3,7 @@ from colorama import Fore
 
 def verify_dependencies(packages_found_list, original_packages, Number_of_process=0, checked_packages=None, packages_to_check=None):
     if Number_of_process == 0:
-        print("\nChecking if all packages are found...\n")
+        print("\nChecking if all packages are found...")
     if checked_packages is None:
         checked_packages = {}
 

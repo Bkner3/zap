@@ -19,9 +19,9 @@ class PathManager:
             "bin": join(user_root, "bin"),
             "data": join(user_root, "data"),
             "sl": join(user_root, "sl"),
-
+            "cache": join(user_root, "cache"),
+            
             # FILES (user)
-            "installed_file": join(user_root, "data", "installed.json"),
             "config_file": join(user_root, "data", "config.json"),
             "log_file": join(user_root, "data", "zap.log"),
             "repos_file": join(user_root, "data", "repos.json"),

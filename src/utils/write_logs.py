@@ -18,7 +18,7 @@ def log_error(message):
 
 def log_debug(message):
     global _config
-    from src.core.config import read_config
+    from src.commands.config import read_config
 
     if _config is None:
         _config = read_config()

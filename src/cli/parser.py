@@ -3,14 +3,14 @@ from sys import argv, exit as sys_exit
 
 from src.core.s_repo import add_repo, remove_repo
 from src.core.downloader import download_to
-from src.core.config import config_zap
+from src.commands.config import config_zap
 from src.core.install import install
 from src.core.remove import remove
-from src.core.list import list_packages
+from src.commands.list import list_packages
 from src.db.database import reset_db
 from src.core.update import update, upgrade
 from src.utils.write_logs import log_info, log_error
-from src.core.info import info
+from src.commands.info import info
 
 from src.cli.ui import show_on_start, show_help
 

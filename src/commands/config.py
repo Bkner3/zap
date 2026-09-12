@@ -14,7 +14,7 @@ data_folder = PathManager.get("data")
 
 def config_zap(packages=None):
     config = read_config()
-    command = packages[0] #Commands to the config
+    command = packages[0] if packages != None else "list"
     parameter = packages[1:] if packages is not None else None
 
 

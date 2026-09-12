@@ -1,4 +1,4 @@
-from src.core.config import read_config
+from src.commands.config import read_config
 from colorama import Style, Fore, init
 
 def show_on_start(corversion):
