@@ -1,7 +1,9 @@
 import sqlite3
 import os
+import json
 
 from src.zap_path import PathManager
+from src.core.confirm import confirm
 from src.utils.write_logs import log_info, log_warning, log_debug
 
 
@@ -25,6 +27,7 @@ def create_tables():
             author TEXT,
             description TEXT,
             dependencies TEXT,
+            json_data TEXT,
             PRIMARY KEY (name, version)
         )
         """)
@@ -44,9 +47,8 @@ def reset_db():
     )
 
     print("This will reset the database, all package information will be lost.")
-    confirm = input("Are you sure? (y/n): ").strip().lower()
 
-    if confirm != "y":
+    if confirm() is False:
         log_info("Cancelled")
         print("Cancelled.")
         return
@@ -76,14 +78,19 @@ def recreate_db():
     log_info("Database recreated.")
     print("Database recreated.")
 
-def save_package(name, version, author, description, dependencies=None):
+
+def save_package(name, version, author, description, dependencies=None, json_data={}):
     init_db()
+
     log_info(
         f"Saving {name} {version} by {author} to the DataBase"
     )
 
     if isinstance(dependencies, list):
         dependencies = ", ".join(dependencies)
+
+    if isinstance(json_data, dict):
+        json_data = json.dumps(json_data)
 
     with get_connection() as conn:
         cursor = conn.cursor()
@@ -94,20 +101,23 @@ def save_package(name, version, author, description, dependencies=None):
             version,
             author,
             description,
-            dependencies
+            dependencies,
+            json_data
         )
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?)
 
         ON CONFLICT(name, version) DO UPDATE SET
             author = excluded.author,
             description = excluded.description,
-            dependencies = excluded.dependencies
+            dependencies = excluded.dependencies,
+            json_data = excluded.json_data
         """, (
             name,
             version,
             author,
             description,
-            dependencies
+            dependencies,
+            json_data
         ))
 
         conn.commit()
@@ -115,7 +125,9 @@ def save_package(name, version, author, description, dependencies=None):
 
 def get_all_packages():
     init_db()
+
     log_info("Returning all packages registered in the database")
+
     with get_connection() as conn:
         cursor = conn.cursor()
 
@@ -125,7 +137,8 @@ def get_all_packages():
             version,
             author,
             description,
-            dependencies
+            dependencies,
+            json_data
         FROM packages
         ORDER BY name, version
         """)
@@ -146,7 +159,8 @@ def get_package(name, version=None):
                 version,
                 author,
                 description,
-                dependencies
+                dependencies,
+                json_data
             FROM packages
             WHERE name = ? AND version = ?
             """, (name, version))
@@ -160,7 +174,8 @@ def get_package(name, version=None):
                 version,
                 author,
                 description,
-                dependencies
+                dependencies,
+                json_data
             FROM packages
             WHERE name = ?
             ORDER BY version
@@ -192,8 +207,8 @@ def delete_package(name, version=None):
             WHERE name = ? AND version = ?
             """, (name, version))
 
-            deleted_message = f"Package {name} {version} removed from the database."
-            not_found_message = f"Package {name} {version} not found on the database."
+            deleted_message = (f"Package {name} {version} removed from the database.")
+            not_found_message = (f"Package {name} {version} not found on the database.")
 
         else:
             cursor.execute("""
@@ -201,8 +216,8 @@ def delete_package(name, version=None):
             WHERE name = ?
             """, (name,))
 
-            deleted_message = f"All versions of package {name} removed from the database."
-            not_found_message = f"Package {name} not found on the database."
+            deleted_message = (f"All versions of package {name} removed from the database.")
+            not_found_message = (f"Package {name} not found on the database.")
 
         conn.commit()
 
@@ -212,4 +227,3 @@ def delete_package(name, version=None):
         else:
             log_warning(not_found_message)
             print(not_found_message)
-

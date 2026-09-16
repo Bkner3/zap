@@ -7,11 +7,12 @@ from src.core.verify_int import verify_dependencies
 from src.zap_path import PathManager
 from src.utils.json_utils import read_json
 from src.utils.write_logs import log_info, log_debug, log_warning
+from src.db.database import get_all_packages
 
 tmp_path = PathManager.get("tmp")
 current_os = system()
 
-def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False, search_dependencies=True):
+def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False, search_dependencies=True, search_on_db=False):
     log_info("Searching for packages...")
     log_debug("Advanced information!")
 
@@ -28,17 +29,30 @@ def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False,
         pkg_name, pkg_version_needed = separate_name_from_version(package)
         pending[pkg_name] = pkg_version_needed
 
-    for file in listdir(tmp_path):
+    metode = (
+        listdir(tmp_path)
+        if search_on_db is False
+        else
+        range(10)
+    )
+
+    for file in metode:
         if not pending:
             break
 
-        if not file.endswith(".json"):
-            continue
+        if search_on_db is False:
+            if not file.endswith(".json"):
+                continue
 
-        file_path = path.join(tmp_path, file)
-        log_debug(f"Reading '{file_path}'.")
-        data = read_json(file_path)
-        base_url = data.get("base_url", "")
+            file_path = path.join(tmp_path, file)
+            log_debug(f"Reading '{file_path}'.")
+            data = read_json(file_path)
+            base_url = data.get("base_url", "")
+        else:
+            data = {"packages": []}
+
+            for name, version, author, description, dependencies, json_data in get_all_packages():
+                data["packages"].append(json_data)
 
         for pkg in data.get("packages", []):
 

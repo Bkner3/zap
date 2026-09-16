@@ -79,7 +79,8 @@ def install(packages, process="package"):
             package_version,
             package_author,
             package_desc,
-            package_dependencies
+            package_dependencies,
+            package
         )
         print(f"Saved {package_name} to database.")
         log_info(f"Installed {package_name} successfully.")

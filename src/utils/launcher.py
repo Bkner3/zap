@@ -177,7 +177,7 @@ def create_launcher(package, index):
         if dependency_path_string:
             dependency_path_string += ";"
 
-        version_launcher = os.path.join(version_sl_path,f"{name}.bat")
+        version_launcher = os.path.join(version_sl_path,f"{name}.cmd")
 
         version_script = f'''@echo off
 
@@ -222,7 +222,7 @@ set "PATH={dependency_path_string}%PKG_ORIGINAL_PATH%"
             if latest_dependency_path_string:
                 latest_dependency_path_string += ";"
 
-            latest_launcher = os.path.join(symlinks_path,f"{name}.bat")
+            latest_launcher = os.path.join(symlinks_path,f"{name}.cmd")
 
             latest_script = f'''@echo off
 
@@ -334,11 +334,12 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
 
 
 def remove_launcher(name):
+    name, version = separate_name_from_version(name)
 
     launcher_path = (
         os.path.join(
             symlinks_path,
-            f"{name}.bat"
+            f"{name}.cmd"
         )
         if system() == "Windows"
         else os.path.join(
@@ -346,22 +347,28 @@ def remove_launcher(name):
             name
         )
     )
+    if version is not None or version is not False:
+        v_launcher = (
+            os.path.join(str(symlinks_path), str(name), str(version), str(f"{name}.cmd"))
+        )
 
     if system() == "Windows":
 
         if os.path.exists(launcher_path):
             os.remove(launcher_path)
+        if os.path.exists(v_launcher):
+            os.remove(v_launcher)
 
             log_info(
                 f"Removing the symlink named: {name}"
             )
         else:
             print(
-                f"Launcher not found: {name}.bat"
+                f"Launcher not found: {name}.cmd"
             )
 
             log_warning(
-                f"Launcher not found: {name}.bat"
+                f"Launcher not found: {name}.cmd"
             )
 
     elif system() == "Linux":

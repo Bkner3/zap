@@ -37,5 +37,5 @@ def show_help():
             {Fore.GREEN}list{Fore.RESET}          List all installed packages
             {Fore.GREEN}info{Fore.RESET}          Show detailed information about a package
             {Fore.GREEN}help{Fore.RESET}          Show this help message
-            {Fore.GREEN}config{Fore.RESET}        Configure zap settings (Is only for stetic purposes, it does not change anything in the program)"""
+            {Fore.GREEN}config{Fore.RESET}        Configure zap settings (Is only for stetic purposes, it does not change anything in the program)\n"""
     print(help_info)

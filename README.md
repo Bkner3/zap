@@ -248,7 +248,7 @@ zap <command> [package]
 > **Warning**
 > `zap upgrade` is only supported when running the compiled ZAP executable.
 > `zap download` does not download the dependencies!!!
->
+> `zap info` is unavaiable!!!
 
 ---
 
@@ -635,6 +635,26 @@ hello
 zap remove hello
 
 ```
+If you want to test if the launchers system is working do this:
+
+```bash
+# 1. Add the official repository if you don't add it
+zap repo-add https://bkner3.github.io/zap-repository/
+
+# 2. Install the 'test-app' test package
+zap install test-app
+
+# 3. List installed packages
+zap list
+
+# 4. Run the installed package launcher
+test-app
+
+# 5. Remove the test package
+zap remove test-app
+
+```
+
 
 ---
 

@@ -51,7 +51,7 @@ def start(current_dir, corversion):
         "repo-remove": lambda: remove_repo(packages),
         "list": list_packages,
         "help": show_help,
-        "info": lambda: info(packages),
+        "info": lambda: print("Unavaiable"), #info(packages),
         "config": lambda: config_zap(packages) if packages else config_zap(),
         "update": lambda: update(),
         "upgrade": lambda: upgrade(corversion),

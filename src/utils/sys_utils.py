@@ -17,10 +17,12 @@ def get_user_path():
         print(Style.BRIGHT + Fore.RED + "Unsupported system!")
         exit()
 
-def open_folder(folder):
+def open_path(path):
     if system() == "Windows":
-        startfile(folder)
+        startfile(path)
+
     elif system() == "Darwin":
-        run(["open", folder])
+        run(["open", path])
+
     elif system() == "Linux":
-        run(["xdg-open", folder])
+        run(["xdg-open", path])
