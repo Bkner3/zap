@@ -49,10 +49,6 @@ if os.path.exists(tmp_path):
     os.makedirs(tmp_path)
 
 if __name__ == "__main__":
-    if system() == "Linux":
-        #ENDS THE LINUX EXECUTION BECAUSE THE FUNCTION TO CREATE LAUNCHERS ARE NOT ADEPT TO LINUX
-        print("Zap\nThe Linux version cannot be used yet, it is still in development.\n")
-        exit(0)
         
     if system() == "Windows" or system() == "Linux":
         start(current_dir, corversion)

@@ -71,9 +71,6 @@ def install(packages, process="package"):
 
         create_launcher(package, index)
 
-            #create_launcher(package_name, executable_path, symlinks_path)
-
-
         save_package(
             package_name,
             package_version,
