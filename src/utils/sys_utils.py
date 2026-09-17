@@ -1,14 +1,14 @@
 from platform import system
 from subprocess import run
 from colorama import Style, Fore
-from os import getenv, startfile
+import os
       
 def get_user_path():
     if system() == "Windows":
-        user = getenv("USERNAME")
+        user = os.getenv("USERNAME")
         return f"C:\\Users\\{user}\\AppData\\Local\\Zap"
     elif system() == "Linux":
-        user = getenv("USER")
+        user = os.getenv("USER")
         return f"/home/{user}/.zap/"
     elif system() == "Darwin":
         print(Style.BRIGHT + Fore.RED + "Say no to mac!")
@@ -19,7 +19,7 @@ def get_user_path():
 
 def open_path(path):
     if system() == "Windows":
-        startfile(path)
+        os.startfile(path)
 
     elif system() == "Darwin":
         run(["open", path])
