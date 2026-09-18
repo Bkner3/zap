@@ -227,7 +227,7 @@ exec "$root/bin/{name}/{version}/{executable}" "$@"""
             latest_path_entries = []
 
             for dependency in latest_dependencies:
-                dependency_path = os.path.join(symlinks_path,dependency["name"],dependency["version"])
+                dependency_path = os.path.join(symlinks_path, dependency["name"],dependency["version"])
 
                 latest_path_entries.append(dependency_path)
 
@@ -252,7 +252,7 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
 "%root%\\bin\\{name}\\{latest_version}\\{latest_package["exec_file"]}" %*
 '''
             else:
-                latest_script = """
+                latest_script = f"""
                 #!/bin/bash
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
