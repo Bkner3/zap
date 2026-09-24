@@ -30,7 +30,7 @@ if is_family debian; then
 
 elif is_family arch; then
     PACKAGE_MANAGER="pacman"
-    pkgm_command=" -S --noconfirm"
+    pkgm_command="-S --noconfirm"
     package="python python-pip"
     echo "Distro: $PRETTY_NAME"
 
@@ -103,5 +103,29 @@ fi
 unzip "$ZIP_OUTPUT"
 cd "$ZAP_TMP/zap"
 
+#CREATE THE ENVIROMMENT
+python -m venv "$ZAP_TMP/zap/.venv/"
+
+#STARTS THE ENVIROMMENT
+. "$ZAP_TMP/zap/.venv/bin/activate"
+
+#INSTALL THE DEPENDENCIES
+"$ZAP_TMP/zap/.venv/bin/pip" install -r requirements.txt
+"$ZAP_TMP/zap/.venv/bin/pip" install pyinstaller
+
+#COMPILE ZAP
+"$ZAP_TMP/zap/.venv/bin/pyinstaller" --onefile --icon="$ZAP_TMP/zap/assets/zap_icon.png" "$ZAP_TMP/zap/zap.py"
+
+mv "$ZAP_TMP/zap/dist/zap" "$ZAP_DIR"
+
+cat > "$ZAP_SL/zap" <<'EOF'
+#!/bin/sh
+exec "$HOME/.zap/zap" "$@"
+EOF
+
+chmod +x "$ZAP_SL/zap"
+#"$ZAP_SL/zap" help
 
 export PATH="$ZAP_SL:$PATH"
+
+echo "Thanks for installing ZAP"
