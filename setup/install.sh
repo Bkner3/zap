@@ -1,17 +1,10 @@
+```sh
 #!/bin/sh
 
 set -e
 
-if [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != "root" ]; then
-    TARGET_USER="$SUDO_USER"
-    USER_HOME="$(eval echo "~$SUDO_USER")"
-else
-    TARGET_USER="$(id -un)"
-    USER_HOME="$HOME"
-fi
-
-ZAP_DIR="$USER_HOME/.zap"
-ZAP_SL="$ZAP_DIR/sl"
+ZAP_DIR="/opt/zap"
+ZAP_BIN="/usr/local/bin/zap"
 ZAP_TMP="$ZAP_DIR/runtime/tmp"
 
 URL="https://github.com/Bkner3/zap/archive/refs/heads/main.zip"
@@ -68,6 +61,7 @@ elif is_family gentoo; then
     pkgm_command="--ask=n"
     package="dev-lang/python app-arch/unzip net-misc/curl"
     PYTHON="/usr/bin/python"
+
 else
     echo "Distro not supported: $PRETTY_NAME"
     echo "ID: $ID"
@@ -86,12 +80,19 @@ else
     fi
 fi
 
+if [ ! -x "$PYTHON" ]; then
+    echo "Error: Python not found: $PYTHON"
+    exit 1
+fi
+
 echo "Installing dependencies..."
 
 $SUDO "$PACKAGE_MANAGER" $pkgm_command $package
 
-mkdir -p "$ZAP_SL"
-mkdir -p "$ZAP_TMP"
+echo "Preparing directories..."
+
+$SUDO mkdir -p "$ZAP_DIR"
+$SUDO mkdir -p "$ZAP_TMP"
 
 echo "Downloading ZAP source..."
 
@@ -131,40 +132,26 @@ echo "Compiling ZAP..."
 
 echo "Installing ZAP..."
 
-mkdir -p "$ZAP_DIR"
+$SUDO mkdir -p "$ZAP_DIR"
 
-mv "dist/zap" "$ZAP_DIR/zap"
+$SUDO rm -f "$ZAP_DIR/zap"
 
-cat > "$ZAP_SL/zap" <<EOF
-#!/bin/sh
-exec "$ZAP_DIR/zap" "\$@"
-EOF
+$SUDO mv "dist/zap" "$ZAP_DIR/zap"
 
-chmod +x "$ZAP_SL/zap"
-chmod +x "$ZAP_DIR/zap"
+$SUDO chmod +x "$ZAP_DIR/zap"
+
+$SUDO rm -f "$ZAP_BIN"
+
+$SUDO ln -s "$ZAP_DIR/zap" "$ZAP_BIN"
 
 rm -rf "$ZAP_SOURCE"
 rm -f "$ZIP_OUTPUT"
 
-PROFILE="$USER_HOME/.profile"
-
-if [ -f "$PROFILE" ]; then
-    if ! grep -Fq 'export PATH="$HOME/.zap/sl:$PATH"' "$PROFILE"; then
-        printf '\nexport PATH="\$HOME/.zap/sl:\$PATH"\n' >> "$PROFILE"
-    fi
-else
-    printf 'export PATH="\$HOME/.zap/sl:\$PATH"\n' > "$PROFILE"
-fi
-
-if [ "$(id -u)" -eq 0 ] && [ "$TARGET_USER" != "root" ]; then
-    TARGET_GROUP="$(id -gn "$TARGET_USER")"
-    chown -R "$TARGET_USER:$TARGET_GROUP" "$ZAP_DIR"
-    chown "$TARGET_USER:$TARGET_GROUP" "$PROFILE" 2>/dev/null || true
-fi
-
 echo ""
 echo "Thanks for installing ZAP!"
 echo "ZAP installed at: $ZAP_DIR/zap"
+echo "Command: $ZAP_BIN"
 echo ""
 echo "Run:"
 echo "  zap"
+```
