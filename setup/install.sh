@@ -36,39 +36,38 @@ if is_family debian; then
     PACKAGE_MANAGER="apt"
     pkgm_command="install -y"
     package="python3 python3-pip python3-venv unzip curl"
-    PYTHON="python3"
+    PYTHON="/usr/bin/python3"
     echo "Distro: $PRETTY_NAME"
 
 elif is_family arch; then
     PACKAGE_MANAGER="pacman"
     pkgm_command="-S --noconfirm"
     package="python python-pip unzip curl"
-    PYTHON="python"
+    PYTHON="/usr/bin/python"
 
 elif is_family fedora; then
     PACKAGE_MANAGER="dnf"
     pkgm_command="install -y"
-    package="python3 python3-pip unzip curl"
-    PYTHON="python3"
+    package="python3 python3-pip python3-venv unzip curl"
+    PYTHON="/usr/bin/python3"
 
 elif is_family suse; then
     PACKAGE_MANAGER="zypper"
     pkgm_command="install --non-interactive"
-    package="python3 python3-pip unzip curl"
-    PYTHON="python3"
+    package="python3 python3-pip python3-venv unzip curl"
+    PYTHON="/usr/bin/python3"
 
 elif is_family alpine; then
     PACKAGE_MANAGER="apk"
     pkgm_command="add --no-interactive"
-    package="python3 py3-pip unzip curl"
-    PYTHON="python3"
+    package="python3 py3-pip py3-virtualenv unzip curl"
+    PYTHON="/usr/bin/python3"
 
 elif is_family gentoo; then
     PACKAGE_MANAGER="emerge"
     pkgm_command="--ask=n"
     package="dev-lang/python app-arch/unzip net-misc/curl"
-    PYTHON="python"
-
+    PYTHON="/usr/bin/python"
 else
     echo "Distro not supported: $PRETTY_NAME"
     echo "ID: $ID"
