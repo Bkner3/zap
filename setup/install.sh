@@ -1,4 +1,3 @@
-```sh
 #!/bin/sh
 
 set -e
@@ -145,4 +144,3 @@ echo "Command: $ZAP_BIN"
 echo ""
 echo "Run:"
 echo "  zap"
-```
