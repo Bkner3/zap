@@ -84,6 +84,11 @@ irm https://raw.githubusercontent.com/Bkner3/zap/refs/heads/main/setup/install.p
 
 ```
 
+## Linux Installation (Beta)
+```bash
+curl -fsSL https://raw.githubusercontent.com/Bkner3/zap/dev/setup/install.sh -o /tmp/install.sh && sudo sh /tmp/install.sh
+```
+
 Or install it using the source code:
 
 ```bash
