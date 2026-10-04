@@ -157,18 +157,35 @@ def create_launcher(package, index):
     # Only direct dependencies are added to the launcher PATH.
     dependencies = find_direct_dependencies(package, index)
 
+def create_launcher(package, index):
+
+    name = package["name"]
+    version = str(package["version"])
+    executable = package["exec_file"]
+
+    install_folder = os.path.join(bin_path, name, version)
+
+    executable_path = os.path.join(install_folder, executable)
+
+    # Only direct dependencies are added to the launcher PATH.
+    dependencies = find_direct_dependencies(package, index)
+
     if system() == "Windows":
 
         package_sl_path = os.path.join(symlinks_path, name)
 
         version_sl_path = os.path.join(package_sl_path, version)
 
-        os.makedirs(version_sl_path,exist_ok=True)
+        os.makedirs(version_sl_path, exist_ok=True)
 
         path_entries = []
 
         for dependency in dependencies:
-            dependency_path = os.path.join(symlinks_path, dependency["name"], dependency["version"])
+            dependency_path = os.path.join(
+                symlinks_path,
+                dependency["name"],
+                dependency["version"]
+            )
 
             path_entries.append(dependency_path)
 
@@ -177,9 +194,12 @@ def create_launcher(package, index):
         if dependency_path_string:
             dependency_path_string += ";"
 
-        version_launcher = os.path.join(version_sl_path,f"{name}.cmd")
-        if system() == "Windows":
-            version_script = f'''@echo off
+        version_launcher = os.path.join(
+            version_sl_path,
+            f"{name}.cmd"
+        )
+
+        version_script = f'''@echo off
 
 set "root=%~dp0..\\..\\.."
 set "bin_path=%root%\\bin"
@@ -190,22 +210,8 @@ if not defined PKG_ORIGINAL_PATH (
 
 set "PATH={dependency_path_string}%PKG_ORIGINAL_PATH%"
 
-    "%root%\\bin\\{name}\\{version}\\{executable}" %*
-    '''
-        else:
-            version_script= f"""
-
-            #!/bin/sh
-
-root="$(cd "$(dirname "$0")/.." && pwd)"
-
-if [ -z "$PKG_ORIGINAL_PATH" ]; then
-    export PKG_ORIGINAL_PATH="$PATH"
-fi
-
-export PATH="{dependency_path_string}:$PKG_ORIGINAL_PATH"
-
-exec "$root/bin/{name}/{version}/{executable}" "$@"""
+"%root%\\bin\\{name}\\{version}\\{executable}" %*
+'''
 
         with open(version_launcher, "w") as f:
             f.write(version_script)
@@ -217,28 +223,39 @@ exec "$root/bin/{name}/{version}/{executable}" "$@"""
         if latest_version is False:
             latest_version = version
 
-        latest_package = find_package(index,name,latest_version)
+        latest_package = find_package(index, name, latest_version)
 
         if latest_package is not False:
 
-            # Only direct dependencies are added to the latest launcher.
-            latest_dependencies = find_direct_dependencies(latest_package, index)
- 
+            latest_dependencies = find_direct_dependencies(
+                latest_package,
+                index
+            )
+
             latest_path_entries = []
 
             for dependency in latest_dependencies:
-                dependency_path = os.path.join(symlinks_path, dependency["name"],dependency["version"])
+                dependency_path = os.path.join(
+                    symlinks_path,
+                    dependency["name"],
+                    dependency["version"]
+                )
 
                 latest_path_entries.append(dependency_path)
 
-            latest_dependency_path_string = ";".join(latest_path_entries)
+            latest_dependency_path_string = ";".join(
+                latest_path_entries
+            )
 
             if latest_dependency_path_string:
                 latest_dependency_path_string += ";"
 
-            latest_launcher = os.path.join(symlinks_path,f"{name}.cmd")
-            if system() == "Windows":
-                latest_script = f'''@echo off
+            latest_launcher = os.path.join(
+                symlinks_path,
+                f"{name}.cmd"
+            )
+
+            latest_script = f'''@echo off
 
 set "root=%~dp0.."
 set "bin_path=%root%\\bin"
@@ -251,21 +268,7 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
 
 "%root%\\bin\\{name}\\{latest_version}\\{latest_package["exec_file"]}" %*
 '''
-            else:
-                latest_script = f"""
-                #!/bin/bash
 
-root="$(cd "$(dirname "$0")/.." && pwd)"
-
-bin_path="$root/bin"
-
-if [ -z "$PKG_ORIGINAL_PATH" ]; then
-    export PKG_ORIGINAL_PATH="$PATH"
-fi
-
-export PATH="{latest_dependency_path_string}$PKG_ORIGINAL_PATH"
-
-"$root/bin/{name}/{latest_version}/{latest_package["exec_file"]}" "$@" """
             with open(latest_launcher, "w") as f:
                 f.write(latest_script)
 
@@ -293,13 +296,21 @@ export PATH="{latest_dependency_path_string}$PKG_ORIGINAL_PATH"
         if latest_version is False:
             latest_version = version
 
-        latest_package = find_package(index, name,latest_version)
+        latest_package = find_package(index, name, latest_version)
 
         if latest_package is not False:
 
-            latest_executable = os.path.join(bin_path, name, latest_version,latest_package["exec_file"])
+            latest_executable = os.path.join(
+                bin_path,
+                name,
+                latest_version,
+                latest_package["exec_file"]
+            )
 
-            latest_link = os.path.join(symlinks_path, name)
+            latest_link = os.path.join(
+                symlinks_path,
+                name
+            )
 
             if os.path.lexists(latest_link):
                 os.remove(latest_link)
@@ -314,9 +325,13 @@ export PATH="{latest_dependency_path_string}$PKG_ORIGINAL_PATH"
                 0o755
             )
         except PermissionError:
-            print(f"Warning: Could not change permissions " f"for {executable_path}")
+            print(
+                f"Warning: Could not change permissions for {executable_path}"
+            )
 
-            log_warning(f"Warning: Could not change permissions "f"for {executable_path}")
+            log_warning(
+                f"Warning: Could not change permissions for {executable_path}"
+            )
 
 
 def remove_launcher(name):
@@ -327,31 +342,59 @@ def remove_launcher(name):
         if system() == "Windows"
         else os.path.join(symlinks_path, name)
     )
-    if version is not None or version is not False:
+
+    if version is not None and version is not False:
         v_launcher = (
-            os.path.join(str(symlinks_path), str(name), str(version), str(f"{name}.cmd"))
+            os.path.join(
+                str(symlinks_path),
+                str(name),
+                str(version),
+                f"{name}.cmd"
+            )
+            if system() == "Windows"
+            else os.path.join(
+                str(symlinks_path),
+                str(name),
+                str(version),
+                str(name)
+            )
         )
 
     if system() == "Windows":
 
         if os.path.exists(launcher_path):
             os.remove(launcher_path)
-        if os.path.exists(v_launcher):
-            os.remove(v_launcher)
 
-            log_info(f"Removing the symlink named: {name}")
-        else:
-            print(f"Launcher not found: {name}.cmd")
+        if version is not None and version is not False:
+            if os.path.exists(v_launcher):
+                os.remove(v_launcher)
 
-            log_warning(f"Launcher not found: {name}.cmd")
+                log_info(f"Removing the launcher named: {name}")
+            else:
+                print(f"Launcher not found: {name}.cmd")
+
+                log_warning(f"Launcher not found: {name}.cmd")
 
     elif system() == "Linux":
 
-        if os.path.lexists(launcher_path):
-            os.remove(launcher_path)
+        if version is not None and version is not False:
 
-            log_info(f"Removing the symlink named: {name}")
+            if os.path.lexists(v_launcher):
+                os.remove(v_launcher)
+
+                log_info(f"Removing the symlink named: {name}@{version}")
+            else:
+                print(f"Symlink not found: {name}@{version}")
+
+                log_warning(f"Symlink not found: {name}@{version}")
+
         else:
-            print(f"Symlink not found: {name}")
 
-            log_warning(f"Symlink not found: {name}")
+            if os.path.lexists(launcher_path):
+                os.remove(launcher_path)
+
+                log_info(f"Removing the symlink named: {name}")
+            else:
+                print(f"Symlink not found: {name}")
+
+                log_warning(f"Symlink not found: {name}")
