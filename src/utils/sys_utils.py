@@ -1,4 +1,5 @@
 from platform import system
+from sys import exit as sys_exit
 from subprocess import run
 from colorama import Style, Fore
 import os
@@ -12,10 +13,10 @@ def get_user_path():
         return f"/home/{user}/.zap/"
     elif system() == "Darwin":
         print(Style.BRIGHT + Fore.RED + "Say no to mac!")
-        exit()
+        sys_exit()
     else:
         print(Style.BRIGHT + Fore.RED + "Unsupported system!")
-        exit()
+        sys_exit()
 
 def open_path(path):
     if system() == "Windows":

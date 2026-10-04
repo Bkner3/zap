@@ -54,4 +54,4 @@ if __name__ == "__main__":
         start(current_dir, corversion)
 
     print(f"{system()} not supported!!!")
-    exit(0)
+    sys.exit(0)

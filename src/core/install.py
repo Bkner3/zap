@@ -61,9 +61,19 @@ def install(packages, process="package"):
             makedirs(install_folder, exist_ok=True)
 
         log_info(f"Moving {file_path} to {install_folder}")
+
+        if not path.exists(file_path):
+            log_warning(f"File {file_path} does not exist. Skipping installation of {package_name}.")
+            print(f"{Fore.YELLOW}File {file_path} does not exist. Skipping installation of {package_name}.{Fore.RESET}")
+            continue
+
         move_files(file_path, install_folder)
 
-        extract_zip(target_file, install_folder)
+        if extract_zip(target_file, install_folder) is False:
+            log_warning(f"Failed to extract {target_file}. Skipping installation of {package_name}.")
+            print(f"{Fore.YELLOW}Failed to extract {target_file}. Skipping installation of {package_name}.{Fore.RESET}")
+            continue
+        
         log_info(f"Deleting {target_file}")
         remove(target_file)
 

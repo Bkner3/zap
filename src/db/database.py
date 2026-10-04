@@ -191,6 +191,7 @@ def get_package(name, version=None):
             log_warning(
                 f"Package '{name}' not found"
             )
+            result = None
 
         return result
 
