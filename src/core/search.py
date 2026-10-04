@@ -1,5 +1,6 @@
 from os import path, listdir
 from platform import system
+from sys import exit as sys_exit
 
 from src.core.confirm import confirm
 from src.utils.versions_utils import compare_versions_symbols, separate_name_from_version
@@ -48,6 +49,7 @@ def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False,
             log_debug(f"Reading '{file_path}'.")
             data = read_json(file_path)
             base_url = data.get("base_url", "")
+            print(f"Searching in {base_url}...")
         else:
             data = {"packages": []}
 
@@ -76,9 +78,7 @@ def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False,
                 if pkg_name not in os_notsupported:
                     os_notsupported.append(pkg_name)
 
-                log_warning(
-                    f"Your os do not support '{pkg_name}'."
-                )
+                log_warning(f"Your os do not support '{pkg_name}'.")
 
                 continue
 
@@ -86,24 +86,21 @@ def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False,
 
             if version_needed:
 
-                if not compare_versions_symbols(
-                    version_needed,
-                    pkg_version
-                ):
-                    log_debug(
-                        f"Version mismatch for '{pkg_name}': "
-                        f"needed '{version_needed}', "
-                        f"found '{pkg_version}'."
-                    )
+                if not compare_versions_symbols(version_needed, pkg_version):
+                    log_debug(f"Version mismatch for '{pkg_name}': " f"needed '{version_needed}', " f"found '{pkg_version}'.")
 
                     continue
 
             pkg["repo"] = data.get("repo", "unknown")
-            pkg["url"] = base_url + pkg.get("url", "")
 
-            log_debug(
-                f"Found '{pkg_name}@{pkg_version}'."
-            )
+            pkg_url = pkg.get("url", "")
+
+            if pkg_url.startswith(("http://", "https://")):
+                pkg["url"] = pkg_url
+            else:
+                pkg["url"] = base_url.rstrip("/") + "/" + pkg_url.lstrip("/")
+
+            log_debug(f"Found '{pkg_name}@{pkg_version}'.")
 
             all_found_packages.append(pkg)
             found.add(pkg_name)
@@ -163,15 +160,13 @@ def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False,
 
             for pkg in blocked_packages:
                 print(f"  {pkg['name']} {pkg['version']}")
-            exit(0)
+            sys_exit(1)
 
         print("Package not found")
 
-        log_warning(
-            "Package not found, exiting"
-        )
+        log_warning("Package not found, exiting")
 
-        exit(0)
+        sys_exit(1)
 
     if skip_confirmation:
         return {
@@ -181,33 +176,21 @@ def search_repo_packages(packages, Number_of_process=0, skip_confirmation=False,
             "blocked": blocked_packages
         }
 
-    print(
-        "\nPackages to be installed:\n"
-        if search_dependencies
-        else "\nPackages to be downloaded:\n"
-    )
+    print("\nPackages to be installed:\n"if search_dependencies else "\nPackages to be downloaded:\n")
 
     for pkg in all_found_packages:
-        print(
-            f"  {pkg['name']}"
-            f"  {pkg.get('version', '')}"
-            f"  [{pkg.get('repo', 'unknown')}]"
-        )
+        print(f"  {pkg['name']}" f"  {pkg.get('version', '')}" f"  [{pkg.get('repo', 'unknown')}]")
 
-    print(
-        f"\nTotal: {len(all_found_packages)} packages"
-    )
+    print(f"\nTotal: {len(all_found_packages)} packages")
 
     if blocked_packages:
         print("\nBlocked packages:")
 
         for pkg in blocked_packages:
-            print(
-                f"  {pkg['name']} {pkg['version']}"
-            )
+            print(f"  {pkg['name']} {pkg['version']}")
 
     if confirm() is False:
-        exit(0)
+        sys_exit(0)
 
     return {
         "packages": all_found_packages,

@@ -4,6 +4,7 @@ from os import path
 from shutil import rmtree
 from src.db.database import init_db, delete_package, get_package
 from colorama import Fore
+from sys import exit as sys_exit
 
 from src.utils.launcher import find_latest_installed_version
 from src.core.confirm import confirm
@@ -24,7 +25,7 @@ def remove(packages):
     print(f"Remove: {packages}")
     if not confirm():
         print("Exiting")
-        exit(0)
+        sys_exit(0)
     
     for package in packages:
         package, version = separate_name_from_version(package)

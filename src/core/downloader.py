@@ -240,4 +240,5 @@ def download_worker(
             failed.append(f"{name}@{version}")
             os.remove(result)
     else:
+        log_error(f"Failed to download {name}@{version}")
         failed.append(f"{name}@{version}")
