@@ -295,7 +295,7 @@ exec "$root/bin/{name}/{version}/{executable}" "$@"
         if os.path.islink(latest_launcher_target) or os.path.exists(latest_launcher_target):
             os.remove(latest_launcher_target)
         if os.path.exists(executable_on_bin_path):
-            current_mode = stat(executable_on_bin_path).st_mode
+            current_mode = os.stat(executable_on_bin_path).st_mode
             os.chmod(executable_on_bin_path, current_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
         os.symlink(version_launcher, latest_launcher_target)
 
