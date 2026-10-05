@@ -282,23 +282,74 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
 
         os.makedirs(version_sl_path, exist_ok=True)
 
-        version_link = os.path.join(version_sl_path, name)
+        path_entries = []
 
-        if os.path.lexists(version_link):
-            os.remove(version_link)
+        for dependency in dependencies:
+            dependency_path = os.path.join(
+                symlinks_path,
+                dependency["name"],
+                dependency["version"]
+            )
 
-        os.symlink(executable_path, version_link)
+            path_entries.append(dependency_path)
 
-        log_info(f"Creating symbolic link: {version_link}")
+        dependency_path_string = ":".join(path_entries)
+
+        version_launcher = os.path.join(
+            version_sl_path,
+            f"{name}.sh"
+        )
+
+        version_script = f'''#!/bin/sh
+
+if [ -z "$PKG_ORIGINAL_PATH" ]; then
+    export PKG_ORIGINAL_PATH="$PATH"
+fi
+
+export PATH="{dependency_path_string}:$PKG_ORIGINAL_PATH"
+
+exec "{executable_path}" "$@"
+'''
+
+        with open(version_launcher, "w") as f:
+            f.write(version_script)
+
+        os.chmod(version_launcher, 0o755)
+
+        log_info(f"Writing launcher: {version_launcher}")
 
         latest_version = find_latest_installed_version(name)
 
         if latest_version is False:
             latest_version = version
 
-        latest_package = find_package(index, name, latest_version)
+        latest_package = find_package(
+            index,
+            name,
+            latest_version
+        )
 
         if latest_package is not False:
+
+            latest_dependencies = find_direct_dependencies(latest_package, index)
+
+            latest_path_entries = []
+
+            for dependency in latest_dependencies:
+                dependency_path = os.path.join(
+                    symlinks_path,
+                    dependency["name"],
+                    dependency["version"]
+                )
+
+                latest_path_entries.append(dependency_path)
+
+            latest_dependency_path_string = ":".join(latest_path_entries)
+
+            latest_launcher = os.path.join(symlinks_path, name)
+
+            if os.path.lexists(latest_launcher):
+                os.remove(latest_launcher)
 
             latest_executable = os.path.join(
                 bin_path,
@@ -307,17 +358,9 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
                 latest_package["exec_file"]
             )
 
-            latest_link = os.path.join(
-                symlinks_path,
-                name
-            )
+            os.symlink(latest_executable, latest_launcher)
 
-            if os.path.lexists(latest_link):
-                os.remove(latest_link)
-
-            os.symlink(latest_executable, latest_link)
-
-            log_info(f"Creating symbolic link: {latest_link}")
+            log_info(f"Creating symbolic link: {latest_launcher}")
 
         try:
             os.chmod(
