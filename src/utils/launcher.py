@@ -7,6 +7,7 @@ from src.utils.versions_utils import (
 )
 from src.zap_path import PathManager
 import os
+import stat
 
 
 symlinks_path = PathManager.get("sl")
@@ -294,8 +295,8 @@ exec "$root/bin/{name}/{version}/{executable}" "$@"
         if os.path.islink(latest_launcher_target) or os.path.exists(latest_launcher_target):
             os.remove(latest_launcher_target)
         if os.path.exists(executable_on_bin_path):
-            current_mode = os.stat(executable_on_bin_path).st_mode
-            os.chmod(executable_on_bin_path, current_mode | os.stat.S_IXUSR | os.stat.S_IXGRP | os.stat.S_IXOTH)
+            current_mode = stat(executable_on_bin_path).st_mode
+            os.chmod(executable_on_bin_path, current_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
         os.symlink(version_launcher, latest_launcher_target)
 
 
