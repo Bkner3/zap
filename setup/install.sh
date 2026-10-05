@@ -1,8 +1,15 @@
 #!/bin/sh
 
 set -e
+if [ -n "$SUDO_USER" ]; then
+    REAL_USER="$SUDO_USER"
+    REAL_HOME="$(getent passwd "$SUDO_USER" | cut -d: -f6)"
+else
+    REAL_USER="$(whoami)"
+    REAL_HOME="$HOME"
+fi
 
-ZAP_DIR="/opt/zap"
+ZAP_DIR="$REAL_HOME/zap"
 ZAP_BIN="/usr/local/bin/zap"
 ZAP_TMP="$ZAP_DIR/runtime/tmp"
 
@@ -136,6 +143,31 @@ $SUDO ln -s "$ZAP_DIR/zap" "$ZAP_BIN"
 
 rm -rf "$ZAP_SOURCE"
 rm -f "$ZIP_OUTPUT"
+
+add_path() {
+    target="$1"
+    line='export PATH="$HOME/.zap/sl:$PATH"'
+    if [ -f "$target" ]; then
+        if ! grep -qs '\.zap/sl' "$target"; then
+            echo "" >> "$target"
+            echo '# ZAP Package Manager' >> "$target"
+            echo "$line" >> "$target"
+        fi
+    fi
+}
+
+add_path "$REAL_HOME/.bashrc"
+add_path "$REAL_HOME/.zshrc"
+add_path "$REAL_HOME/.profile"
+add_path "$REAL_HOME/.bash_profile"
+
+if [ -d "$REAL_HOME/.config/fish" ]; then
+    mkdir -p "$REAL_HOME/.config/fish/conf.d"
+    echo 'set -gx PATH $HOME/.zap/sl $PATH' > "$REAL_HOME/.config/fish/conf.d/zap.fish"
+fi
+
+echo 'export PATH="$HOME/.zap/sl:$PATH"' > /etc/profile.d/zap.sh
+chmod +x /etc/profile.d/zap.sh
 
 echo ""
 echo "Thanks for installing ZAP!"
