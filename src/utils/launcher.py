@@ -258,7 +258,7 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
         if dependency_path_string:
             dependency_path_string += ":"
 
-        package_sl_path = os.path.join(symlinks_path, name)
+        package_sl_path = os.path.join(symlinks_path, f"_{name}")
         version_sl_path = os.path.join(package_sl_path, version)
         os.makedirs(version_sl_path, exist_ok=True)
 
@@ -288,7 +288,7 @@ exec "\(root/bin/{name}/{version}/{executable}" "\)@"
         if latest_version is False:
             latest_version = version
 
-        latest_launcher_target = os.path.join(symlinks_path, name)
+        latest_launcher_target = os.path.join(symlinks_path, f"_{name}")
         main_symlink = os.path.join(symlinks_path, name)
 
         if os.path.exists(latest_launcher_target):
@@ -320,7 +320,7 @@ def remove_launcher(name_arg):
             if system() == "Windows"
             else os.path.join(
                 str(symlinks_path),
-                str(name),
+                f"_{str(name)}",
                 str(version),
                 str(name)
             )
