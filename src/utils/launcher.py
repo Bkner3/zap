@@ -262,12 +262,12 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
         version_sl_path = os.path.join(package_sl_path, version)
         os.makedirs(version_sl_path, exist_ok=True)
 
-        version_launcher = os.path.join(symlinks_path, name)
+        version_launcher = os.path.join(version_sl_path, name)
 
         version_script = f'''#!/bin/bash
 
-script_dir="\((cd -- "\)(dirname -- "${{BASH_SOURCE[0]}}")" && pwd)"
-root="\((cd -- "\)script_dir/../../.." && pwd)"
+script_dir="$(cd -- "$(dirname -- "${{BASH_SOURCE[0]}}")" && pwd)"
+root="$(cd -- "$script_dir/../../.." && pwd)"
 
 if [ -z "${{PKG_ORIGINAL_PATH+x}}" ]; then
     export PKG_ORIGINAL_PATH="$PATH"
@@ -275,7 +275,7 @@ fi
 
 export PATH="{dependency_path_string}$PKG_ORIGINAL_PATH"
 
-exec "\(root/bin/{name}/{version}/{executable}" "\)@"
+exec "$root/bin/{name}/{version}/{executable}" "$@"
 '''
 
         with open(version_launcher, "w") as f:
@@ -288,16 +288,12 @@ exec "\(root/bin/{name}/{version}/{executable}" "\)@"
         if latest_version is False:
             latest_version = version
 
-        latest_launcher_target = os.path.join(symlinks_path, f"_{name}")
-        main_symlink = os.path.join(symlinks_path, name)
+        latest_launcher_target = os.path.join(symlinks_path, f"{name}")
 
-        if os.path.exists(latest_launcher_target):
-            if os.path.lexists(main_symlink) and not os.path.isdir(main_symlink):
-                os.remove(main_symlink)
+        if os.path.islink(latest_launcher_target) or os.path.exists(latest_launcher_target):
+            os.remove(latest_launcher_target)
 
-            rel_target = os.path.relpath(latest_launcher_target, symlinks_path)
-            os.symlink(rel_target, main_symlink)
-            log_info(f"Created symlink: {main_symlink} -> {rel_target}")
+        os.symlink(version_launcher, latest_launcher_target)
 
 
 def remove_launcher(name_arg):
