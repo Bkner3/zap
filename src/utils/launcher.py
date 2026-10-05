@@ -262,7 +262,7 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
         version_sl_path = os.path.join(package_sl_path, version)
         os.makedirs(version_sl_path, exist_ok=True)
 
-        version_launcher = os.path.join(version_sl_path, name)
+        version_launcher = os.path.join(symlinks_path, name)
 
         version_script = f'''#!/bin/bash
 
