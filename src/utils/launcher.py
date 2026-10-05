@@ -284,20 +284,17 @@ exec "\(root/bin/{name}/{version}/{executable}" "\)@"
         os.chmod(version_launcher, 0o755)
         log_info(f"Writing launcher: {version_launcher}")
 
-        # Lógica do Symlink da versão mais recente no Linux
         latest_version = find_latest_installed_version(name)
         if latest_version is False:
             latest_version = version
 
-        latest_launcher_target = os.path.join(symlinks_path, name, latest_version, name)
+        latest_launcher_target = os.path.join(symlinks_path, name)
         main_symlink = os.path.join(symlinks_path, name)
 
         if os.path.exists(latest_launcher_target):
-            # Se já existir um ficheiro ou symlink principal com o nome do pacote, removemos antes de criar
             if os.path.lexists(main_symlink) and not os.path.isdir(main_symlink):
                 os.remove(main_symlink)
 
-            # Criar o symlink relativo ou absoluto a apontar para a versão mais recente
             rel_target = os.path.relpath(latest_launcher_target, symlinks_path)
             os.symlink(rel_target, main_symlink)
             log_info(f"Created symlink: {main_symlink} -> {rel_target}")
