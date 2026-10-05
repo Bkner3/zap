@@ -269,7 +269,7 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
         version_script = f'''#!/bin/bash
 
 script_dir="$(cd -- "$(dirname -- "${{BASH_SOURCE[0]}}")" && pwd)"
-root="$(cd -- "$script_dir/../../.." && pwd)"
+root="$(cd -- "$script_dir/../../../.." && pwd)"
 
 if [ -z "${{PKG_ORIGINAL_PATH+x}}" ]; then
     export PKG_ORIGINAL_PATH="$PATH"
