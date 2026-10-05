@@ -148,6 +148,7 @@ def create_launcher(package, index):
     name = package["name"]
     version = str(package["version"])
     executable = package["exec_file"]
+    executable_on_bin_path = os.path.join(bin_path, name, version, executable)
 
     dependencies = find_direct_dependencies(package, index)
 
@@ -292,7 +293,9 @@ exec "$root/bin/{name}/{version}/{executable}" "$@"
 
         if os.path.islink(latest_launcher_target) or os.path.exists(latest_launcher_target):
             os.remove(latest_launcher_target)
-
+        if os.path.exists(executable_on_bin_path):
+            current_mode = os.stat(executable_on_bin_path).st_mode
+            os.chmod(executable_on_bin_path, current_mode | os.stat.S_IXUSR | os.stat.S_IXGRP | os.stat.S_IXOTH)
         os.symlink(version_launcher, latest_launcher_target)
 
 
