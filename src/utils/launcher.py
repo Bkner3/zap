@@ -271,32 +271,37 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
         if not latest_version:
             latest_version = version
 
+        PKG_ORIGINAL_PATH = "PKG_ORIGINAL_PATH"
+        x = "+x"
+        BASH_SOURCE = ["BASH_SOURCE[0]", "MOTHER, FATHER, GENTLEMAN"]
         version_latest_launcher = f'''#!/bin/bash
 
-script_dir="\((cd -- "\)(dirname -- "${{BASH_SOURCE[0]}}")" && pwd)"
-root="\((cd -- "\)script_dir/.." && pwd)"
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+root="$(cd -- "$script_dir/.." && pwd)"
 
-if [ -z "${{PKG_ORIGINAL_PATH+x}}" ]; then
+if [ -z "${PKG_ORIGINAL_PATH+x}" ]; then
     export PKG_ORIGINAL_PATH="$PATH"
 fi
 
 export PATH="{dependency_path_string}$PKG_ORIGINAL_PATH"
 
 exec "\(root/bin/{name}/{latest_version}/{executable}" "\)@"
+
 '''
 
         version_script = f'''#!/bin/bash
 
-script_dir="\((cd -- "\)(dirname -- "${{BASH_SOURCE[0]}}")" && pwd)"
-root="\((cd -- "\)script_dir/../../.." && pwd)"
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+root="$(cd -- "$script_dir/../../.." && pwd)"
 
-if [ -z "${{PKG_ORIGINAL_PATH+x}}" ]; then
+if [ -z "${PKG_ORIGINAL_PATH+x}" ]; then
     export PKG_ORIGINAL_PATH="$PATH"
 fi
 
 export PATH="{dependency_path_string}$PKG_ORIGINAL_PATH"
 
-exec "\(root/bin/{name}/{version}/{executable}" "\)@"
+exec "\(root/bin/{name}/{latest_version}/{executable}" "\)@"
+
 '''
 
         with open(version_launcher, "w") as f:
