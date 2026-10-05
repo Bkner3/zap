@@ -251,7 +251,7 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
         for dependency in dependencies:
             dependency_path = os.path.join(
                 symlinks_path,
-                dependency["name"],
+                f"_{dependency['name']}",
                 dependency["version"]
             )
             path_entries.append(dependency_path)
@@ -265,11 +265,16 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
         os.makedirs(version_sl_path, exist_ok=True)
 
         version_launcher = os.path.join(version_sl_path, name)
+        version_latest_launcher_path = os.path.join(symlinks_path, name)
 
-        version_script = f'''#!/bin/bash
+        latest_version = find_latest_installed_version(name)
+        if not latest_version:
+            latest_version = version
 
-script_dir="$(cd -- "$(dirname -- "${{BASH_SOURCE[0]}}")" && pwd)"
-root="$(cd -- "$script_dir/../../../.." && pwd)"
+        version_latest_launcher = f'''#!/bin/bash
+
+script_dir="\((cd -- "\)(dirname -- "${{BASH_SOURCE[0]}}")" && pwd)"
+root="\((cd -- "\)script_dir/.." && pwd)"
 
 if [ -z "${{PKG_ORIGINAL_PATH+x}}" ]; then
     export PKG_ORIGINAL_PATH="$PATH"
@@ -277,27 +282,37 @@ fi
 
 export PATH="{dependency_path_string}$PKG_ORIGINAL_PATH"
 
-exec "$root/bin/{name}/{version}/{executable}" "$@"
+exec "\(root/bin/{name}/{latest_version}/{executable}" "\)@"
+'''
+
+        version_script = f'''#!/bin/bash
+
+script_dir="\((cd -- "\)(dirname -- "${{BASH_SOURCE[0]}}")" && pwd)"
+root="\((cd -- "\)script_dir/../../.." && pwd)"
+
+if [ -z "${{PKG_ORIGINAL_PATH+x}}" ]; then
+    export PKG_ORIGINAL_PATH="$PATH"
+fi
+
+export PATH="{dependency_path_string}$PKG_ORIGINAL_PATH"
+
+exec "\(root/bin/{name}/{version}/{executable}" "\)@"
 '''
 
         with open(version_launcher, "w") as f:
             f.write(version_script)
 
+        with open(version_latest_launcher_path, "w") as f:
+            f.write(version_latest_launcher)
+
+        os.chmod(version_latest_launcher_path, 0o755)
         os.chmod(version_launcher, 0o755)
+
         log_info(f"Writing launcher: {version_launcher}")
 
-        latest_version = find_latest_installed_version(name)
-        if latest_version is False:
-            latest_version = version
-
-        latest_launcher_target = os.path.join(symlinks_path, f"{name}")
-
-        if os.path.islink(latest_launcher_target) or os.path.exists(latest_launcher_target):
-            os.remove(latest_launcher_target)
         if os.path.exists(executable_on_bin_path):
             current_mode = os.stat(executable_on_bin_path).st_mode
             os.chmod(executable_on_bin_path, current_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-        os.symlink(version_launcher, latest_launcher_target)
 
 
 def remove_launcher(name_arg):
