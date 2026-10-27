@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 """
-Zippy Asset Packager - A simple package manager
+Zip Asset Packager - A simple package manager
 #Version: 0.7.0-beta
 Github: https://github.com/Bkner3/zap
 This project is in early development, expect bugs and missing features.

@@ -19,7 +19,7 @@ def show_on_start(corversion):
                 else:
                     print(f"{Style.BRIGHT} {config.get('user_logo')}")
 
-    print(Style.BRIGHT + Fore.GREEN + f"Zippy Asset Packager - {corversion}")
+    print(Style.BRIGHT + Fore.GREEN + f"Zip Asset Packager - {corversion}")
     print(Fore.CYAN + "──────────────────────────────────────────")
 
 def show_help():

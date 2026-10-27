@@ -10,7 +10,8 @@
 
 ```
 
-# ZAP — Zippy Asset Packager
+# ZAP — Zip Asset Packager
+
 
 A lightweight command-line package manager written in Python.
 
