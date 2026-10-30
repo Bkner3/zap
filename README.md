@@ -25,7 +25,7 @@ A lightweight command-line package manager written in Python.
 > **Current Status**
 > ZAP is under active development.
 > **Windows:** Fully supported.
-> **Linux:** Currently unavailable / under active development (the program exits immediately on Linux environments).
+> **Linux:** The CLI and package launchers are in beta; Linux support remains under active development.
 > **Package Dependency Resolution:** Experimental recursive resolution is implemented.
 
 ---
@@ -602,7 +602,7 @@ ZAP automatically performs SHA-256 integrity verification upon downloading packa
 | Operating System | Status |
 | --- | --- |
 | **Windows** | Supported |
-| **Linux** | Unavailable (Under Development) |
+| **Linux** | Beta (Under Development) |
 | **macOS** | Not Supported |
 
 ---

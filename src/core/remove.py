@@ -44,7 +44,7 @@ def remove(packages):
 
         rmtree(package_path)
 
-        remove_launcher(package)
+        remove_launcher(package if version is None else f"{package}@{version}")
         #This will launch on the next realese!
         """
         if version:
