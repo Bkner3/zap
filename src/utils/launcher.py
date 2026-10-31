@@ -263,57 +263,34 @@ set "PATH={latest_dependency_path_string}%PKG_ORIGINAL_PATH%"
         package_sl_path = os.path.join(symlinks_path, f"_{name}")
         version_sl_path = os.path.join(package_sl_path, version)
         os.makedirs(version_sl_path, exist_ok=True)
-
         version_launcher = os.path.join(version_sl_path, name)
-        version_latest_launcher_path = os.path.join(symlinks_path, name)
-
-        latest_version = find_latest_installed_version(name)
-        if not latest_version:
-            latest_version = version
-
-        PKG_ORIGINAL_PATH = "PKG_ORIGINAL_PATH"
-        x = "+x"
-        BASH_SOURCE = ["BASH_SOURCE[0]", "MOTHER, FATHER, GENTLEMAN"]
-        version_latest_launcher = f'''#!/bin/bash
-
-script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-root="$(cd -- "$script_dir/.." && pwd)"
-
-if [ -z "${PKG_ORIGINAL_PATH+x}" ]; then
-    export PKG_ORIGINAL_PATH="$PATH"
-fi
-
-export PATH="{dependency_path_string}$PKG_ORIGINAL_PATH"
-
-exec "\(root/bin/{name}/{latest_version}/{executable}" "\)@"
-
-'''
-
         version_script = f'''#!/bin/bash
 
-script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-root="$(cd -- "$script_dir/../../.." && pwd)"
+script_dir="$(cd -- "$(dirname -- "${{BASH_SOURCE[0]}}")" && pwd)"
+if [ "$(basename -- "$script_dir")" = "{version}" ]; then
+    root="$(cd -- "$script_dir/../../.." && pwd)"
+else
+    root="$(cd -- "$script_dir/.." && pwd)"
+fi
 
-if [ -z "${PKG_ORIGINAL_PATH+x}" ]; then
+if [ -z "${{PKG_ORIGINAL_PATH+x}}" ] || [ -z "$PKG_ORIGINAL_PATH" ]; then
     export PKG_ORIGINAL_PATH="$PATH"
 fi
 
 export PATH="{dependency_path_string}$PKG_ORIGINAL_PATH"
-
-exec "\(root/bin/{name}/{latest_version}/{executable}" "\)@"
-
+exec "$root/bin/{name}/{version}/{executable}" "$@"
 '''
-
-        with open(version_launcher, "w") as f:
+        with open(version_launcher, "w", encoding="utf-8") as f:
             f.write(version_script)
-
-        with open(version_latest_launcher_path, "w") as f:
-            f.write(version_latest_launcher)
-
-        os.chmod(version_latest_launcher_path, 0o755)
         os.chmod(version_launcher, 0o755)
-
         log_info(f"Writing launcher: {version_launcher}")
+
+        latest_version = find_latest_installed_version(name) or version
+        latest_launcher = os.path.join(symlinks_path, name)
+        latest_target = os.path.join("_" + name, latest_version, name)
+        if os.path.lexists(latest_launcher):
+            os.remove(latest_launcher)
+        os.symlink(latest_target, latest_launcher)
 
         if os.path.exists(executable_on_bin_path):
             current_mode = os.stat(executable_on_bin_path).st_mode
@@ -367,10 +344,10 @@ def remove_launcher(name_arg):
                 # Atualizar ou remover o symlink principal se foi removida a versão ativa
                 latest_version = find_latest_installed_version(name)
                 if latest_version:
-                    new_target = os.path.join(symlinks_path, name, latest_version, name)
+                    new_target = os.path.join("_" + name, latest_version, name)
                     if os.path.lexists(launcher_path):
                         os.remove(launcher_path)
-                    os.symlink(os.path.relpath(new_target, symlinks_path), launcher_path)
+                    os.symlink(new_target, launcher_path)
                 elif os.path.lexists(launcher_path):
                     os.remove(launcher_path)
             else:
@@ -383,3 +360,7 @@ def remove_launcher(name_arg):
             else:
                 print(f"Symlink not found: {name}")
                 log_warning(f"Symlink not found: {name}")
+            package_sl_path = os.path.join(symlinks_path, "_" + name)
+            if os.path.isdir(package_sl_path):
+                import shutil
+                shutil.rmtree(package_sl_path)
