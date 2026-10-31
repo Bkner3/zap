@@ -15,10 +15,8 @@
 
 A lightweight command-line package manager written in Python.
 
-[Official Repository](https://bkner3.github.io/zap-repository/)
-
 > **Official Repository URL:**
-> `[https://bkner3.github.io/zap-repository/](https://bkner3.github.io/zap-repository/)`
+>  [Official Repository](https://bkner3.github.io/zap-repository/)
 
 ---
 
@@ -26,6 +24,7 @@ A lightweight command-line package manager written in Python.
 > ZAP is under active development.
 > **Windows:** Fully supported.
 > **Linux:** The CLI and package launchers are in beta; Linux support remains under active development.
+> **MacOS:** Don't have support because I don't have a macbook.
 > **Package Dependency Resolution:** Experimental recursive resolution is implemented.
 
 ---
@@ -603,7 +602,7 @@ ZAP automatically performs SHA-256 integrity verification upon downloading packa
 | --- | --- |
 | **Windows** | Supported |
 | **Linux** | Beta (Under Development) |
-| **macOS** | Not Supported |
+| **macOS** | Not Supported (I don't have a macbook to test and develop) |
 
 ---
 
